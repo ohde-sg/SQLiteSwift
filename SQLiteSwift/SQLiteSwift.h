@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-
 //! Project version number for SQLiteSwift.
 FOUNDATION_EXPORT double SQLiteSwiftVersionNumber;
 

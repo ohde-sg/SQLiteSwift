@@ -7,9 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F7204DFE391FE22FA449EFD /* Pods_SQLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D6E18B8D7466A9A1327DC4D /* Pods_SQLiteSwift.framework */; };
+		FF66265C1C78DFA2004A0926 /* SQLiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265B1C78DFA2004A0926 /* SQLiteTests.swift */; };
+		FF66265E1C78E2FB004A0926 /* SQLiteSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */; };
+		FF6626601C790773004A0926 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265F1C790773004A0926 /* User.swift */; };
 		FF831B491C70E05400851CE6 /* SQLiteSwift.h in Headers */ = {isa = PBXBuildFile; fileRef = FF831B481C70E05400851CE6 /* SQLiteSwift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF831B501C70E05400851CE6 /* SQLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF831B451C70E05400851CE6 /* SQLiteSwift.framework */; };
 		FF831B551C70E05400851CE6 /* SQLiteSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF831B541C70E05400851CE6 /* SQLiteSwiftTests.swift */; };
+		FF831B601C70E07600851CE6 /* SQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF831B5F1C70E07600851CE6 /* SQLite.swift */; };
+		FF831B621C70E0C900851CE6 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FF831B611C70E0C900851CE6 /* libsqlite3.0.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,12 +29,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D6E18B8D7466A9A1327DC4D /* Pods_SQLiteSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SQLiteSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E1740419EFE5C9D275D8336 /* Pods-SQLiteSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLiteSwift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SQLiteSwift/Pods-SQLiteSwift.debug.xcconfig"; sourceTree = "<group>"; };
+		A6E23A70C870FB2B940DD7D8 /* Pods-SQLiteSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLiteSwift.release.xcconfig"; path = "Pods/Target Support Files/Pods-SQLiteSwift/Pods-SQLiteSwift.release.xcconfig"; sourceTree = "<group>"; };
+		FF66265B1C78DFA2004A0926 /* SQLiteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteTests.swift; sourceTree = "<group>"; };
+		FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteSwift.swift; sourceTree = "<group>"; };
+		FF66265F1C790773004A0926 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		FF831B451C70E05400851CE6 /* SQLiteSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SQLiteSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF831B481C70E05400851CE6 /* SQLiteSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteSwift.h; sourceTree = "<group>"; };
 		FF831B4A1C70E05400851CE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF831B4F1C70E05400851CE6 /* SQLiteSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SQLiteSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF831B541C70E05400851CE6 /* SQLiteSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteSwiftTests.swift; sourceTree = "<group>"; };
 		FF831B561C70E05400851CE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF831B5F1C70E07600851CE6 /* SQLite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLite.swift; sourceTree = "<group>"; };
+		FF831B611C70E0C900851CE6 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -36,6 +50,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF831B621C70E0C900851CE6 /* libsqlite3.0.tbd in Frameworks */,
+				8F7204DFE391FE22FA449EFD /* Pods_SQLiteSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,12 +66,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6A81858131FECD9298E9AFA8 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9E1740419EFE5C9D275D8336 /* Pods-SQLiteSwift.debug.xcconfig */,
+				A6E23A70C870FB2B940DD7D8 /* Pods-SQLiteSwift.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		B6E7530027F09F164AA69FFD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0D6E18B8D7466A9A1327DC4D /* Pods_SQLiteSwift.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		FF831B3B1C70E05400851CE6 = {
 			isa = PBXGroup;
 			children = (
+				FF831B611C70E0C900851CE6 /* libsqlite3.0.tbd */,
 				FF831B471C70E05400851CE6 /* SQLiteSwift */,
 				FF831B531C70E05400851CE6 /* SQLiteSwiftTests */,
 				FF831B461C70E05400851CE6 /* Products */,
+				6A81858131FECD9298E9AFA8 /* Pods */,
+				B6E7530027F09F164AA69FFD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +109,8 @@
 			children = (
 				FF831B481C70E05400851CE6 /* SQLiteSwift.h */,
 				FF831B4A1C70E05400851CE6 /* Info.plist */,
+				FF831B5F1C70E07600851CE6 /* SQLite.swift */,
+				FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */,
 			);
 			path = SQLiteSwift;
 			sourceTree = "<group>";
@@ -80,8 +118,10 @@
 		FF831B531C70E05400851CE6 /* SQLiteSwiftTests */ = {
 			isa = PBXGroup;
 			children = (
+				FF66265B1C78DFA2004A0926 /* SQLiteTests.swift */,
 				FF831B541C70E05400851CE6 /* SQLiteSwiftTests.swift */,
 				FF831B561C70E05400851CE6 /* Info.plist */,
+				FF66265F1C790773004A0926 /* User.swift */,
 			);
 			path = SQLiteSwiftTests;
 			sourceTree = "<group>";
@@ -104,10 +144,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FF831B591C70E05400851CE6 /* Build configuration list for PBXNativeTarget "SQLiteSwift" */;
 			buildPhases = (
+				CB65D05263722CD1A51A0670 /* Check Pods Manifest.lock */,
 				FF831B401C70E05400851CE6 /* Sources */,
 				FF831B411C70E05400851CE6 /* Frameworks */,
 				FF831B421C70E05400851CE6 /* Headers */,
 				FF831B431C70E05400851CE6 /* Resources */,
+				2927DF5CCCC2CAB5560D6066 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -191,11 +233,46 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2927DF5CCCC2CAB5560D6066 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SQLiteSwift/Pods-SQLiteSwift-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CB65D05263722CD1A51A0670 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FF831B401C70E05400851CE6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF831B601C70E07600851CE6 /* SQLite.swift in Sources */,
+				FF66265E1C78E2FB004A0926 /* SQLiteSwift.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,7 +280,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF66265C1C78DFA2004A0926 /* SQLiteTests.swift in Sources */,
 				FF831B551C70E05400851CE6 /* SQLiteSwiftTests.swift in Sources */,
+				FF6626601C790773004A0926 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +301,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -270,6 +350,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -309,7 +390,10 @@
 		};
 		FF831B5A1C70E05400851CE6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E1740419EFE5C9D275D8336 /* Pods-SQLiteSwift.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -320,12 +404,16 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yoshiyuki.SQLiteSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		FF831B5B1C70E05400851CE6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A6E23A70C870FB2B940DD7D8 /* Pods-SQLiteSwift.release.xcconfig */;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -378,6 +466,7 @@
 				FF831B5B1C70E05400851CE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FF831B5C1C70E05400851CE6 /* Build configuration list for PBXNativeTarget "SQLiteSwiftTests" */ = {
 			isa = XCConfigurationList;
@@ -386,6 +475,7 @@
 				FF831B5E1C70E05400851CE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
