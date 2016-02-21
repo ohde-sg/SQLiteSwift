@@ -69,8 +69,8 @@ class SQLiteSwiftTests: XCTestCase {
         conn.deleteTable(["User"])
         conn.commit()
         
-        let result:(Bool,User) = SQLiteConnection(filePath: dbFilePath).createTable()
-        XCTAssertTrue(result.0)
+        let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        XCTAssertTrue(result.result)
         
         conn.beginTransaction()
         XCTAssertTrue(conn.isExistTable(["User"]).result)
@@ -81,13 +81,13 @@ class SQLiteSwiftTests: XCTestCase {
         let connector = SQLiteConnection(filePath: dbFilePath);
         
         connector.beginTransaction()
-        let result:(Bool,User) = connector.deleteTable()
-        XCTAssertTrue(result.0)
+        let result:SSResult<User> = connector.deleteTable()
+        XCTAssertTrue(result.result)
         connector.commit()
         
         connector.beginTransaction()
-        let result2:(Bool,User) = connector.createTable()
-        XCTAssertTrue(result2.0)
+        let result2:SSResult<User> = connector.createTable()
+        XCTAssertTrue(result2.result)
         connector.commit()
         
         conn.beginTransaction()

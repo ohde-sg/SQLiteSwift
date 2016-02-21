@@ -19,7 +19,7 @@ public class SQLiteConnection{
     init(filePath:String){
         conn = SQLite(filePath)
     }
-    func createTable<T:SSMappable>() -> (Bool,T){
+    func createTable<T:SSMappable>() -> SSResult<T>{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
@@ -28,24 +28,24 @@ public class SQLiteConnection{
             defer{
                 conn.commit()
             }
-            return (conn.createTable(makeCreateStatement(connector, model: model)),model)
+            return SSResult<T>(result: conn.createTable(makeCreateStatement(connector, model: model)))
         }
-        return (conn.createTable(makeCreateStatement(connector, model: model)),model)
+        return SSResult<T>(result: conn.createTable(makeCreateStatement(connector, model: model)))
     }
-    func deleteTable<T:SSMappable>() -> (Bool,T) {
+    func deleteTable<T:SSMappable>() -> SSResult<T> {
         let model = T()
         if !conn.inTransaction {
             conn.beginTransaction()
             defer{
                 conn.commit()
             }
-            return (conn.deleteTable([model.table]),model)
+            return SSResult<T>(result:conn.deleteTable([model.table]))
         }
-        return (conn.deleteTable([model.table]),model)
+        return SSResult<T>(result:conn.deleteTable([model.table]))
     }
     
-    func table<T:SSMappable>() -> [T]{
-        return [T()]
+    func table<T:SSMappable>() -> SSTable<T>{
+        return SSTable<T>()
     }
     
     func query<T:SSMappable>() -> [T]{
