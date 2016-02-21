@@ -15,13 +15,50 @@ public protocol SSMappable {
 }
 
 public class SQLiteConnection<T:SSMappable> {
-    var conn: SQLite
+    internal var conn: SQLite
     init(filePath:String){
         conn = SQLite(filePath)
     }
     func createTable() -> Bool{
-        return false
+        let model = T()
+        let connector = SSConnector(type: .Scan)
+        model.dbMap(connector)
+        if !conn.inTransaction {
+            conn.beginTransaction()
+            defer{
+                conn.commit()
+            }
+            return conn.createTable(makeCreateStatement(connector, model: model))
+        }
+        return conn.createTable(makeCreateStatement(connector, model: model))
     }
+    func deleteTable() -> Bool {
+        let model = T()
+        if !conn.inTransaction {
+            conn.beginTransaction()
+            defer{
+                conn.commit()
+            }
+            return conn.deleteTable([model.table])
+        }
+        return conn.deleteTable([model.table])
+    }
+    func beginTransaction(){
+        conn.beginTransaction()
+    }
+    func commit(){
+        conn.commit()
+    }
+    
+    private func makeCreateStatement(connector:SSConnector,model:T) -> String {
+        var columns:String = String.empty
+        connector.scans.enumerate().forEach{
+            let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
+            columns += $0.element.createColumnStatement() + separator
+        }
+        return "CREATE TABLE \(model.table)(\(columns));"
+    }
+    
     func scan() -> SSConnector{
         let model = T()
         let connector = SSConnector(type: .Scan)

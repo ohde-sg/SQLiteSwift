@@ -17,8 +17,17 @@ class SQLiteSwiftTests: XCTestCase {
             return self.dir + "/" + self.dbFile
         }
     }
+    var _conn :SQLite?
+    private var conn: SQLite{
+        if _conn == nil {
+            _conn = SQLite(self.dbFilePath)
+            return _conn!
+        }
+        return _conn!
+    }
     
     override func setUp() {
+        print(dbFilePath)
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -31,8 +40,9 @@ class SQLiteSwiftTests: XCTestCase {
     
     func testSample() {
         let scan = SQLiteConnection<User>(filePath: dbFilePath).scan()
-        var values = ["id":(CLType.CL_Integer,[CLAttr.PrimaryKey,CLAttr.AutoIncrement]),
+        var values = ["id":(CLType.CL_Integer,[CLAttr.PrimaryKey,CLAttr.AutoIncrement, .NotNull]),
             "name":(CLType.CL_Text,[CLAttr.Unique]),
+            "age" : (CLType.CL_Integer,[CLAttr.Check("age>0")]),
             "nickname":(CLType.CL_Text,[CLAttr.Default("None")]),
             "isMan":(CLType.CL_Integer,[]),]
         for item in scan.scans {
@@ -47,6 +57,34 @@ class SQLiteSwiftTests: XCTestCase {
         }
         let map = SQLiteConnection<User>(filePath: dbFilePath).mapping()
         print(map.id,map.name,map.nickname,map.isMan)
+    }
+    
+    func testCreateTableNotInTransaction() {
+        conn.beginTransaction()
+        conn.deleteTable(["User"])
+        conn.commit()
+        
+        XCTAssertTrue(SQLiteConnection<User>(filePath: dbFilePath).createTable())
+        
+        conn.beginTransaction()
+        XCTAssertTrue(conn.isExistTable(["User"]).result)
+        conn.commit()
+    }
+    
+    func testCreateTableInTransaction() {
+        let connector = SQLiteConnection<User>(filePath: dbFilePath);
+        
+        connector.beginTransaction()
+        XCTAssertTrue(connector.deleteTable())
+        connector.commit()
+        
+        connector.beginTransaction()
+        XCTAssertTrue(connector.createTable())
+        connector.commit()
+        
+        conn.beginTransaction()
+        XCTAssertTrue(conn.isExistTable(["User"]).result)
+        conn.commit()
     }
     
     func testPerformanceExample() {

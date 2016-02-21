@@ -17,6 +17,34 @@ public class SSScan: SSBase{
         self.name = name
         self.attrs = attrs
     }
+    func createColumnStatement() -> String{
+        var statement = name
+        switch type! {
+        case .CL_Integer:
+            statement += String.whiteSpace + "INTEGER"
+        case .CL_Text:
+            statement += String.whiteSpace + "TEXT"
+        case .CL_Real:
+            statement += String.whiteSpace + "REAL"
+        }
+        for item in attrs {
+            switch item {
+            case .AutoIncrement:
+                statement += String.whiteSpace + "AUTOINCREMENT"
+            case .PrimaryKey:
+                statement += String.whiteSpace + "PRIMARY KEY"
+            case .NotNull:
+                statement += String.whiteSpace + "NOT NULL"
+            case .Unique:
+                statement += String.whiteSpace + "UNIQUE"
+            case .Default(let value):
+                statement += String.whiteSpace + "DEFAULT \(value)"
+            case .Check(let value):
+                statement += String.whiteSpace + "CHECK(\(value))"
+            }
+        }
+        return statement
+    }
 }
 
 public func <- <T> (inout lhs:T?,rhs:SSScan) {

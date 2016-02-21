@@ -34,11 +34,15 @@ class SQLite {
         return executeUpdate(sql,nil)
     }
     
-    func deleteTable(tables:[String]) {
+    func deleteTable(tables:[String]) -> Bool {
         let sql = "DROP TABLE IF EXISTS"
+        var result:Bool = true
         tables.forEach{
-            executeUpdate(sql + " \($0);", nil)
+            if !executeUpdate(sql + " \($0);", nil) {
+                result = false
+            }
         }
+        return result
     }
     
     func insert(sql:String,values:[AnyObject]!) -> Bool {
@@ -60,6 +64,10 @@ class SQLite {
             db.open()
             db.beginTransaction()
         }
+    }
+    
+    var inTransaction:Bool {
+        return db.inTransaction()
     }
     
     func commit() {

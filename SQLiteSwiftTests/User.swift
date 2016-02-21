@@ -13,6 +13,7 @@ class User: SSMappable {
     var table:String = "User"
     var id:Int?
     var name:String?
+    var age:Int?
     var nickname:String?
     var isMan:Bool?
     
@@ -21,9 +22,10 @@ class User: SSMappable {
     }
     
     func dbMap(connector:SSConnector){
-        id       <- connector["id",CLAttr.PrimaryKey,CLAttr.AutoIncrement]
-        name     <- connector["name",CLAttr.Unique]
-        nickname <- connector["nickname",CLAttr.Default("None")]
+        id       <- connector["id", .PrimaryKey, .AutoIncrement, .NotNull]
+        name     <- connector["name", .Unique]
+        age      <- connector["age", .Check("age>0")]
+        nickname <- connector["nickname", .Default("None")]
         isMan    <- connector["isMan"]
     }
 }
