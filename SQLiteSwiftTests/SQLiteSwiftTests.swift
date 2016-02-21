@@ -39,13 +39,14 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testSample() {
-        let scan = SQLiteConnection<User>(filePath: dbFilePath).scan()
+        let connector = SQLiteConnection(filePath: dbFilePath)
+        let scan:(SSConnector,User) = connector.scan()
         var values = ["id":(CLType.CL_Integer,[CLAttr.PrimaryKey,CLAttr.AutoIncrement, .NotNull]),
             "name":(CLType.CL_Text,[CLAttr.Unique]),
             "age" : (CLType.CL_Integer,[CLAttr.Check("age>0")]),
             "nickname":(CLType.CL_Text,[CLAttr.Default("None")]),
             "isMan":(CLType.CL_Integer,[]),]
-        for item in scan.scans {
+        for item in scan.0.scans {
             //Assert type of Column
             XCTAssertEqual(item.type!, values[item.name]!.0)
             //Assert count of attributes
@@ -55,8 +56,12 @@ class SQLiteSwiftTests: XCTestCase {
                 XCTAssertEqual(String(item.attrs[index]),String(value))
             }
         }
-        let map = SQLiteConnection<User>(filePath: dbFilePath).mapping()
+        let map:User = SQLiteConnection(filePath: dbFilePath).mapping()
         print(map.id,map.name,map.nickname,map.isMan)
+    }
+    
+    func testTable(){
+        
     }
     
     func testCreateTableNotInTransaction() {
@@ -64,7 +69,8 @@ class SQLiteSwiftTests: XCTestCase {
         conn.deleteTable(["User"])
         conn.commit()
         
-        XCTAssertTrue(SQLiteConnection<User>(filePath: dbFilePath).createTable())
+        let result:(Bool,User) = SQLiteConnection(filePath: dbFilePath).createTable()
+        XCTAssertTrue(result.0)
         
         conn.beginTransaction()
         XCTAssertTrue(conn.isExistTable(["User"]).result)
@@ -72,14 +78,16 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testCreateTableInTransaction() {
-        let connector = SQLiteConnection<User>(filePath: dbFilePath);
+        let connector = SQLiteConnection(filePath: dbFilePath);
         
         connector.beginTransaction()
-        XCTAssertTrue(connector.deleteTable())
+        let result:(Bool,User) = connector.deleteTable()
+        XCTAssertTrue(result.0)
         connector.commit()
         
         connector.beginTransaction()
-        XCTAssertTrue(connector.createTable())
+        let result2:(Bool,User) = connector.createTable()
+        XCTAssertTrue(result2.0)
         connector.commit()
         
         conn.beginTransaction()

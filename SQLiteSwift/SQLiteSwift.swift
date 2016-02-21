@@ -14,12 +14,12 @@ public protocol SSMappable {
     init()
 }
 
-public class SQLiteConnection<T:SSMappable> {
+public class SQLiteConnection{
     internal var conn: SQLite
     init(filePath:String){
         conn = SQLite(filePath)
     }
-    func createTable() -> Bool{
+    func createTable<T:SSMappable>() -> (Bool,T){
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
@@ -28,21 +28,30 @@ public class SQLiteConnection<T:SSMappable> {
             defer{
                 conn.commit()
             }
-            return conn.createTable(makeCreateStatement(connector, model: model))
+            return (conn.createTable(makeCreateStatement(connector, model: model)),model)
         }
-        return conn.createTable(makeCreateStatement(connector, model: model))
+        return (conn.createTable(makeCreateStatement(connector, model: model)),model)
     }
-    func deleteTable() -> Bool {
+    func deleteTable<T:SSMappable>() -> (Bool,T) {
         let model = T()
         if !conn.inTransaction {
             conn.beginTransaction()
             defer{
                 conn.commit()
             }
-            return conn.deleteTable([model.table])
+            return (conn.deleteTable([model.table]),model)
         }
-        return conn.deleteTable([model.table])
+        return (conn.deleteTable([model.table]),model)
     }
+    
+    func table<T:SSMappable>() -> [T]{
+        return [T()]
+    }
+    
+    func query<T:SSMappable>() -> [T]{
+        return [T()]
+    }
+    
     func beginTransaction(){
         conn.beginTransaction()
     }
@@ -50,7 +59,7 @@ public class SQLiteConnection<T:SSMappable> {
         conn.commit()
     }
     
-    private func makeCreateStatement(connector:SSConnector,model:T) -> String {
+    private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
         var columns:String = String.empty
         connector.scans.enumerate().forEach{
             let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
@@ -59,13 +68,13 @@ public class SQLiteConnection<T:SSMappable> {
         return "CREATE TABLE \(model.table)(\(columns));"
     }
     
-    func scan() -> SSConnector{
+    func scan<T:SSMappable>() -> (SSConnector,T){
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
-        return connector
+        return (connector,model)
     }
-    func mapping() -> T{
+    func mapping<T:SSMappable>() -> T{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
