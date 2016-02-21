@@ -16,6 +16,8 @@
 		FF831B551C70E05400851CE6 /* SQLiteSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF831B541C70E05400851CE6 /* SQLiteSwiftTests.swift */; };
 		FF831B601C70E07600851CE6 /* SQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF831B5F1C70E07600851CE6 /* SQLite.swift */; };
 		FF831B621C70E0C900851CE6 /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FF831B611C70E0C900851CE6 /* libsqlite3.0.tbd */; };
+		FFCAB8FF1C7973FF0040D64B /* SSMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCAB8FE1C7973FF0040D64B /* SSMap.swift */; };
+		FFCAB9011C7974220040D64B /* SSScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCAB9001C7974220040D64B /* SSScan.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +45,8 @@
 		FF831B561C70E05400851CE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF831B5F1C70E07600851CE6 /* SQLite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLite.swift; sourceTree = "<group>"; };
 		FF831B611C70E0C900851CE6 /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		FFCAB8FE1C7973FF0040D64B /* SSMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSMap.swift; sourceTree = "<group>"; };
+		FFCAB9001C7974220040D64B /* SSScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSScan.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +115,8 @@
 				FF831B4A1C70E05400851CE6 /* Info.plist */,
 				FF831B5F1C70E07600851CE6 /* SQLite.swift */,
 				FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */,
+				FFCAB8FE1C7973FF0040D64B /* SSMap.swift */,
+				FFCAB9001C7974220040D64B /* SSScan.swift */,
 			);
 			path = SQLiteSwift;
 			sourceTree = "<group>";
@@ -271,7 +277,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFCAB8FF1C7973FF0040D64B /* SSMap.swift in Sources */,
 				FF831B601C70E07600851CE6 /* SQLite.swift in Sources */,
+				FFCAB9011C7974220040D64B /* SSScan.swift in Sources */,
 				FF66265E1C78E2FB004A0926 /* SQLiteSwift.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

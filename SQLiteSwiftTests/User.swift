@@ -21,9 +21,9 @@ class User: SSMappable {
     }
     
     func dbMap(connector:SSConnector){
-        id       <- connector["id",CLAttr.PrimaryKey,CLAttr.Unique]
-        name     <- connector["name"]
-        nickname <- connector["nickname"]
-//        isMan    <- connector["isMan"]
+        id       <- connector["id",CLAttr.PrimaryKey,CLAttr.AutoIncrement]
+        name     <- connector["name",CLAttr.Unique]
+        nickname <- connector["nickname",CLAttr.Default("None")]
+        isMan    <- connector["isMan"]
     }
 }

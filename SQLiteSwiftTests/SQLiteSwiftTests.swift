@@ -30,10 +30,21 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testSample() {
-//        let scan = SQLiteConnection<User>(filePath: dbFilePath).scan()
-//        for item in scan.scans {
-//            print(item.name,item.type,item.attrs)
-//        }
+        let scan = SQLiteConnection<User>(filePath: dbFilePath).scan()
+        var values = ["id":(CLType.CL_Integer,[CLAttr.PrimaryKey,CLAttr.AutoIncrement]),
+            "name":(CLType.CL_Text,[CLAttr.Unique]),
+            "nickname":(CLType.CL_Text,[CLAttr.Default("None")]),
+            "isMan":(CLType.CL_Integer,[]),]
+        for item in scan.scans {
+            //Assert type of Column
+            XCTAssertEqual(item.type!, values[item.name]!.0)
+            //Assert count of attributes
+            XCTAssertEqual(values[item.name]!.1.count,item.attrs.count)
+            //Assert type of attributes
+            for (index,value) in  values[item.name]!.1.enumerate() {
+                XCTAssertEqual(String(item.attrs[index]),String(value))
+            }
+        }
         let map = SQLiteConnection<User>(filePath: dbFilePath).mapping()
         print(map.id,map.name,map.nickname,map.isMan)
     }
