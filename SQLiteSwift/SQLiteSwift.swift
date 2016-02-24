@@ -96,8 +96,10 @@ public class SQLiteConnection{
     }
 }
 
-public protocol SSBase{
+/// Use for let work to column. e.g) scan column info, mapping value to column variables
+public protocol SSWorker{
     var value: AnyObject? { get set }
+    func work<T>(inout lhs:T?)
 }
 
 public class SSConnector {
@@ -107,13 +109,13 @@ public class SSConnector {
     public init(type:SSType){
         self.type = type
     }
-    public subscript (name:String,attrs:CLAttr...) -> SSBase{
+    public subscript (name:String,attrs:CLAttr...) -> SSWorker{
         switch self.type {
-        case .Map:
+        case .Map:  // return map worker
             let map = SSMap()
             map.value = values[name]!
             return map
-        case .Scan:
+        case .Scan: // return scan worker
             let scan = SSScan(name,attrs: attrs)
             scans.append(scan)
             return scan
@@ -147,13 +149,8 @@ infix operator <- {
     associativity none
 }
 
-public func <- <T>(inout lhs:T?,rhs:SSBase){
-    if rhs is SSScan {
-        lhs <- rhs as! SSScan
-    }
-    if rhs is SSMap {
-        lhs <- rhs as! SSMap
-    }
+public func <- <T>(inout lhs:T?,rhs:SSWorker){
+    rhs.work(&lhs)
 }
 
 

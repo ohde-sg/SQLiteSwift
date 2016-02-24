@@ -8,14 +8,15 @@
 
 import Foundation
 
-public class SSMap: SSBase{
+public class SSMap: SSWorker{
     public var value : AnyObject?
+    public func work<T>(inout lhs: T?) {
+        if lhs is Bool {
+            let val:Int = self.value as! Int
+            lhs = (val != 0) as? T
+        }else{
+            lhs = self.value as? T
+        }
+    }
 }
 
-public func <- <T>(inout lhs:T?,rhs:SSMap) {
-    lhs = rhs.value as? T
-}
-public func <- (inout lhs:Bool?,rhs:SSMap) {
-    let val:Int = rhs.value as! Int
-    lhs = (val != 0)
-}
