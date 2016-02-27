@@ -9,8 +9,5 @@
 import Foundation
 
 class SSTable<T:SSMappable> {
-    var model:T
-    init(){
-        model = T()
-    }
+    var records:[T] = []
 }

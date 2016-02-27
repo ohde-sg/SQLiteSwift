@@ -23,29 +23,45 @@ public class SQLiteConnection{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
-        if !conn.inTransaction {
-            conn.beginTransaction()
-            defer{
-                conn.commit()
-            }
-            return SSResult<T>(result: conn.createTable(makeCreateStatement(connector, model: model)))
+        return executeInTransaction{
+            return SSResult<T>(result: self.conn.createTable(self.makeCreateStatement(connector, model: model)))
         }
-        return SSResult<T>(result: conn.createTable(makeCreateStatement(connector, model: model)))
     }
     func deleteTable<T:SSMappable>() -> SSResult<T> {
         let model = T()
+        return executeInTransaction{
+            return SSResult<T>(result:self.conn.deleteTable([model.table]))
+        }
+    }
+    
+    private func executeInTransaction<T>(execute:()->T) -> T{
         if !conn.inTransaction {
             conn.beginTransaction()
-            defer{
+            defer {
                 conn.commit()
             }
-            return SSResult<T>(result:conn.deleteTable([model.table]))
+            return execute()
         }
-        return SSResult<T>(result:conn.deleteTable([model.table]))
+        return execute()
     }
     
     func table<T:SSMappable>() -> SSTable<T>{
-        return SSTable<T>()
+        let connector = SSConnector(type: .Map)
+        return executeInTransaction{
+            return self.tableInTransaction(connector)
+        }
+    }
+    
+    private func tableInTransaction<T:SSMappable> (connector:SSConnector)-> SSTable<T>{
+        let table = SSTable<T>()
+        let results = conn.select(makeSelectAllStatement(T()), values: nil)
+        for result in results {
+            connector.values = result
+            let model = T()
+            model.dbMap(connector)
+            table.records.append(model)
+        }
+        return table
     }
     
     func query<T:SSMappable>() -> [T]{
@@ -66,6 +82,10 @@ public class SQLiteConnection{
             columns += $0.element.createColumnStatement() + separator
         }
         return "CREATE TABLE \(model.table)(\(columns));"
+    }
+    
+    private func makeSelectAllStatement<T:SSMappable>(model:T) -> String {
+        return "SELECT * From \(model.table);"
     }
     
     func scan<T:SSMappable>() -> (SSConnector,T){

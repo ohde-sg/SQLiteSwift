@@ -108,15 +108,20 @@ class SQLite {
         return (!rtnBl && noExistTables.count>0) ? (false,noExistTables) : (rtnBl,nil)
     }
     
-    func select(sql:String,values:[AnyObject]!) -> [[NSObject:AnyObject]] {
+    func select(sql:String,values:[AnyObject]!) -> [[String:AnyObject]] {
         let result = try? db.executeQuery(sql, values: values)
         defer { result?.close() }
-        var rtn:[[NSObject:AnyObject]] = []
+        var rtn:[[String:AnyObject]] = []
         guard let theResult = result else{
             return rtn
         }
         while  theResult.next() {
-            rtn.append(theResult.resultDictionary())
+            var dict:[String:AnyObject] = [:]
+            for(key,value) in theResult.resultDictionary() {
+                let theKey = key as! String
+                dict[theKey] = value
+            }
+            rtn.append(dict)
         }
         return rtn
     }
