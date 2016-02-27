@@ -75,8 +75,20 @@ public class SQLiteConnection{
         }
     }
     
-    func query<T:SSMappable>() -> [T]{
-        return [T()]
+    func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
+        let connector = SSConnector(type: .Map)
+        return executeInTransaction{
+            [unowned self] in
+            let table = SSTable<T>()
+            let results = self.conn.select(query, values: params)
+            for result in results {
+                connector.values = result
+                let model = T()
+                model.dbMap(connector)
+                table.records.append(model)
+            }
+            return table
+        }
     }
     
     func beginTransaction(){
@@ -84,6 +96,9 @@ public class SQLiteConnection{
     }
     func commit(){
         conn.commit()
+    }
+    func rollback(){
+        conn.rollback()
     }
     
     private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
@@ -101,13 +116,10 @@ public class SQLiteConnection{
     
     private func makeInsertStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
         var columns = String.empty
-        var count = 0
-        connector.scans.enumerate().forEach{
-            if let _ = $0.element.value {
-                let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
-                columns += $0.element.name + separator
-                count++
-            }
+        let count = connector.scans.count{ $0.value != nil }
+        connector.scans.select{ $0.value != nil }.enumerate().forEach{
+            let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
+            columns += $0.element.name + separator
         }
         return "INSERT INTO \(model.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
     }
@@ -178,7 +190,9 @@ public class SSConnector {
         switch self.type {
         case .Map:  // return map worker
             let map = SSMap()
-            map.value = values[name]!
+            if let theValue = values[name]{
+                map.value = theValue
+            }
             return map
         case .Scan: // return scan worker
             let scan = SSScan(name,attrs: attrs)

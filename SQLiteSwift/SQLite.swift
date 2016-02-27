@@ -77,6 +77,12 @@ class SQLite {
         }
     }
     
+    func rollback(){
+        if db.inTransaction() {
+            db.rollback()
+        }
+    }
+    
     /// Return whether DBFile is exist
     /// - returns: true on exist, false on not exist
     func isExistDBFile() -> Bool {

@@ -21,6 +21,7 @@
 		FFB0F3C81C799CAA00D374C2 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB0F3C71C799CAA00D374C2 /* StringExtensions.swift */; };
 		FFCAB8FF1C7973FF0040D64B /* SSMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCAB8FE1C7973FF0040D64B /* SSMap.swift */; };
 		FFCAB9011C7974220040D64B /* SSScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCAB9001C7974220040D64B /* SSScan.swift */; };
+		FFDD55221C81E438008F8887 /* SequenceTypeExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDD55211C81E438008F8887 /* SequenceTypeExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		FFB0F3C71C799CAA00D374C2 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		FFCAB8FE1C7973FF0040D64B /* SSMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSMap.swift; sourceTree = "<group>"; };
 		FFCAB9001C7974220040D64B /* SSScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSScan.swift; sourceTree = "<group>"; };
+		FFDD55211C81E438008F8887 /* SequenceTypeExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SequenceTypeExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				FFB0F3C71C799CAA00D374C2 /* StringExtensions.swift */,
+				FFDD55211C81E438008F8887 /* SequenceTypeExtensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 			files = (
 				FFAFC5141C79CA660007795C /* SSTable.swift in Sources */,
 				FFCAB8FF1C7973FF0040D64B /* SSMap.swift in Sources */,
+				FFDD55221C81E438008F8887 /* SequenceTypeExtensions.swift in Sources */,
 				FF831B601C70E07600851CE6 /* SQLite.swift in Sources */,
 				FFB0F3C81C799CAA00D374C2 /* StringExtensions.swift in Sources */,
 				FFAFC5161C79E8060007795C /* SSResult.swift in Sources */,

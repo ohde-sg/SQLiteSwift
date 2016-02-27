@@ -9,7 +9,6 @@
 import Foundation
 
 class SSResult<T:SSMappable> {
-    var model:T?
     var result:Bool
     init(result:Bool){
         self.result = result

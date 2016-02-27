@@ -86,6 +86,69 @@ class SQLiteSwiftTests: XCTestCase {
         }
     }
     
+    func testQuery(){
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let params = [
+            ["21","takasi","takayan","1"],
+            ["25","hanako","hanatyan","0"],
+            ["30","masumi","masu","1"],
+        ]
+        conn.beginTransaction()
+        for param in params {
+            conn.insert("INSERT INTO User(age,name,nickname,isMan) VALUES(?,?,?,?);", values: param)
+        }
+        conn.commit()
+        
+        let query = "SELECT name, age FROM User WHERE age>? AND age<?;"
+        let values = [21,30]
+        let result:SSTable<User> = SQLiteConnection(filePath: dbFilePath).query(query, params: values)
+        
+        XCTAssertEqual(result.records.count,1)
+        let element = result.records[0]
+        XCTAssertEqual(Int(params[1][0]),element.age)
+        XCTAssertEqual(params[1][1],element.name)
+    }
+
+    
+    func testQueryInTransaction(){
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let params = [
+            ["21","takasi","takayan","1"],
+            ["25","hanako","hanatyan","0"],
+            ["30","masumi","masu","1"],
+        ]
+        conn.beginTransaction()
+        for param in params {
+            conn.insert("INSERT INTO User(age,name,nickname,isMan) VALUES(?,?,?,?);", values: param)
+        }
+        conn.commit()
+        
+        let connect = SQLiteConnection(filePath: dbFilePath)
+        let query = "SELECT name, age FROM User WHERE age>? AND age<?;"
+        let values = [21,30]
+        connect.beginTransaction()
+        let result:SSTable<User> = connect.query(query, params: values)
+        
+        let user = User()
+        user.name = "hoge"
+        user.age = 23
+        let dmResult:SSResult<User> = connect.insert(user)
+        XCTAssertTrue(dmResult.result)
+        let dmResult2:SSTable<User> = connect.table()
+        XCTAssertEqual(dmResult2.records.count,4)
+        
+        connect.commit()
+        
+        let dmResult3:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        XCTAssertEqual(dmResult3.records.count,4)
+        
+        let element = result.records[0]
+        XCTAssertEqual(Int(params[1][0]),element.age)
+        XCTAssertEqual(params[1][1],element.name)
+    }
+    
     func testInsert(){
         let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
         let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
@@ -142,8 +205,8 @@ class SQLiteSwiftTests: XCTestCase {
             XCTAssertTrue(result.result)
         }
         //still uncomitt, so result of select is 0 count
-        let tmpResult:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
-        XCTAssertEqual(tmpResult.records.count,0)
+        let tmpResult:SSTable<User> = connection.table()
+        XCTAssertEqual(tmpResult.records.count,2)
         
         connection.commit()
         
