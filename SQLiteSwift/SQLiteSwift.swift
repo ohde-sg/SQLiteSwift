@@ -66,6 +66,15 @@ public class SQLiteConnection{
         }
     }
     
+    func insert<T:SSMappable>(model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.Scan)
+        model.dbMap(connector)
+        return executeInTransaction{
+            [unowned self] in
+            return SSResult<T>(result:self.conn.insert(self.makeInsertStatement(connector,model: model), values:self.getValues(connector)))
+        }
+    }
+    
     func query<T:SSMappable>() -> [T]{
         return [T()]
     }
@@ -88,6 +97,40 @@ public class SQLiteConnection{
     
     private func makeSelectAllStatement<T:SSMappable>(model:T) -> String {
         return "SELECT * From \(model.table);"
+    }
+    
+    private func makeInsertStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
+        var columns = String.empty
+        var count = 0
+        connector.scans.enumerate().forEach{
+            if let _ = $0.element.value {
+                let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
+                columns += $0.element.name + separator
+                count++
+            }
+        }
+        return "INSERT INTO \(model.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
+    }
+    
+    private func getValues(connector:SSConnector) -> [AnyObject] {
+        var values: [AnyObject] = []
+        connector.scans.enumerate().forEach{
+            if let theValue = $0.element.value {
+                values.append(theValue)
+            }
+        }
+        return values
+    }
+    
+    private func makePlaceholderStatement(count:Int) -> String {
+        var rtn = String.empty
+        for i in 0..<count {
+            rtn += "?"
+            if i != count-1 {
+                rtn.append(Character(","))
+            }
+        }
+        return rtn
     }
     
     func scan<T:SSMappable>() -> (SSConnector,T){

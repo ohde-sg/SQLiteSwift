@@ -86,6 +86,76 @@ class SQLiteSwiftTests: XCTestCase {
         }
     }
     
+    func testInsert(){
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        
+        let user = User()
+        user.name = "takashi"
+        user.age = 27
+        user.nickname = "takayan"
+        user.isMan = true
+        
+        let user2 = User()
+        user2.name = "nozomi"
+        user2.age = 20
+        user2.nickname = "nozomin"
+        user2.isMan = false
+        
+        let users:[User] = [user,user2]
+        
+        users.enumerate().forEach{
+            let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).insert($0.element)
+            XCTAssertTrue(result.result)
+        }
+        let results:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        results.records.enumerate().forEach{
+            XCTAssertEqual($0.element.name!, users[$0.index].name)
+            XCTAssertEqual($0.element.age!, users[$0.index].age)
+            XCTAssertEqual($0.element.nickname!, users[$0.index].nickname)
+            XCTAssertEqual($0.element.isMan!, users[$0.index].isMan)
+        }
+    }
+    
+    func testInsertInTransaction(){
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        
+        let user = User()
+        user.name = "takashi"
+        user.age = 27
+        user.nickname = "takayan"
+        user.isMan = true
+        
+        let user2 = User()
+        user2.name = "nozomi"
+        user2.age = 20
+        user2.nickname = "nozomin"
+        user2.isMan = false
+        
+        let users:[User] = [user,user2]
+        
+        let connection = SQLiteConnection(filePath: dbFilePath)
+        connection.beginTransaction()
+        users.enumerate().forEach{
+            let result:SSResult<User> = connection.insert($0.element)
+            XCTAssertTrue(result.result)
+        }
+        //still uncomitt, so result of select is 0 count
+        let tmpResult:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        XCTAssertEqual(tmpResult.records.count,0)
+        
+        connection.commit()
+        
+        let results:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        results.records.enumerate().forEach{
+            XCTAssertEqual($0.element.name!, users[$0.index].name)
+            XCTAssertEqual($0.element.age!, users[$0.index].age)
+            XCTAssertEqual($0.element.nickname!, users[$0.index].nickname)
+            XCTAssertEqual($0.element.isMan!, users[$0.index].isMan)
+        }
+    }
+    
     func testCreateTableNotInTransaction() {
         conn.beginTransaction()
         conn.deleteTable(["User"])
