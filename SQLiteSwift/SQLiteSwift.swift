@@ -19,17 +19,22 @@ public class SQLiteConnection{
     init(filePath:String){
         conn = SQLite(filePath)
     }
+    deinit {
+        print("SQLiteConnection is deinit!!!")
+    }
     func createTable<T:SSMappable>() -> SSResult<T>{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
         return executeInTransaction{
+            [unowned self] in
             return SSResult<T>(result: self.conn.createTable(self.makeCreateStatement(connector, model: model)))
         }
     }
     func deleteTable<T:SSMappable>() -> SSResult<T> {
         let model = T()
         return executeInTransaction{
+            [unowned self] in
             return SSResult<T>(result:self.conn.deleteTable([model.table]))
         }
     }
@@ -48,20 +53,17 @@ public class SQLiteConnection{
     func table<T:SSMappable>() -> SSTable<T>{
         let connector = SSConnector(type: .Map)
         return executeInTransaction{
-            return self.tableInTransaction(connector)
+            [unowned self] in
+            let table = SSTable<T>()
+            let results = self.conn.select(self.makeSelectAllStatement(T()), values: nil)
+            for result in results {
+                connector.values = result
+                let model = T()
+                model.dbMap(connector)
+                table.records.append(model)
+            }
+            return table
         }
-    }
-    
-    private func tableInTransaction<T:SSMappable> (connector:SSConnector)-> SSTable<T>{
-        let table = SSTable<T>()
-        let results = conn.select(makeSelectAllStatement(T()), values: nil)
-        for result in results {
-            connector.values = result
-            let model = T()
-            model.dbMap(connector)
-            table.records.append(model)
-        }
-        return table
     }
     
     func query<T:SSMappable>() -> [T]{
