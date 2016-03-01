@@ -86,6 +86,37 @@ class SQLiteSwiftTests: XCTestCase {
         }
     }
     
+    func testUpdate(){
+        //Create User Table if User Table is not exist
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
+        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let params = [
+            ["27","takasi","takayan","1"]
+        ]
+        conn.beginTransaction()
+        for param in params {
+            conn.insert("INSERT INTO User(age,name,nickname,isMan) VALUES(?,?,?,?);", values: param)
+        }
+        conn.commit()
+        
+        var result:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        var model = result.records[0]
+        model.name = "none"
+        model.age = 100
+        model.isMan = false
+        
+        let result2:SSResult<User> = SQLiteConnection(filePath: dbFilePath).update(model)
+        XCTAssertTrue(result2.result)
+        
+        result = SQLiteConnection(filePath: dbFilePath).table()
+        
+        model = result.records[0]
+        XCTAssertEqual(model.name!,"none")
+        XCTAssertEqual(model.age!,100)
+        XCTAssertEqual(model.nickname!,"takayan")
+        XCTAssertEqual(model.isMan!,false)
+    }
+    
     func testQuery(){
         let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
         let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()

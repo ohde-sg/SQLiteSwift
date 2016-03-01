@@ -24,4 +24,11 @@ extension SequenceType {
         }
         return rtn
     }
+    
+    func first(judge:(Self.Generator.Element) -> Bool) -> Self.Generator.Element? {
+        for item in self {
+            if judge(item) { return item }
+        }
+        return nil
+    }
 }

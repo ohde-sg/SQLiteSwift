@@ -75,6 +75,27 @@ public class SQLiteConnection{
         }
     }
     
+    func update<T:SSMappable>(model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.Scan)
+        model.dbMap(connector)
+        var pkNovalueFg = false
+        for item in connector.scans{
+            item.attrs.forEach{
+                if $0.id == CLAttr.PrimaryKey.id {
+                    pkNovalueFg = (item.value == nil)
+                }
+            }
+        }
+        
+        if pkNovalueFg {
+            return SSResult<T>(result: false)
+        }
+        return executeInTransaction{
+            [unowned self] in
+            return SSResult<T>(result:self.conn.update(self.makeUpdateStatement(connector,model: model), values:self.getValues(connector)))
+        }
+    }
+    
     func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
         let connector = SSConnector(type: .Map)
         return executeInTransaction{
@@ -99,6 +120,24 @@ public class SQLiteConnection{
     }
     func rollback(){
         conn.rollback()
+    }
+    
+    private func makeUpdateStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
+        var columns = String.empty
+        let count = connector.scans.count{ $0.value != nil }
+        connector.scans.select{ $0.value != nil }.enumerate().forEach{
+            let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
+            columns += "\($0.element.name)=?" + separator
+        }
+        let key = connector.scans.first{
+            for item in $0.attrs {
+                if item.id == CLAttr.PrimaryKey.id {
+                    return true
+                }
+            }
+            return false
+        }!
+        return "UPDATE \(model.table) SET \(columns) WHERE \(key.name)=\(key.value!);"
     }
     
     private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
@@ -221,6 +260,23 @@ public enum CLAttr{
     case Unique
     case Default(AnyObject)
     case Check(String)
+    
+    var id:Int {
+        switch self{
+        case .PrimaryKey:
+            return 1
+        case .AutoIncrement:
+            return 2
+        case .NotNull:
+            return 3
+        case .Unique:
+            return 4
+        case .Default:
+            return 5
+        case .Check:
+            return 6
+        }
+    }
 }
 
 infix operator <- {
