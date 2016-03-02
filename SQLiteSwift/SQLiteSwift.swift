@@ -78,18 +78,10 @@ public class SQLiteConnection{
     func update<T:SSMappable>(model:T) -> SSResult<T> {
         let connector = SSConnector(type:.Scan)
         model.dbMap(connector)
-        var pkNovalueFg = false
-        for item in connector.scans{
-            item.attrs.forEach{
-                if $0.id == CLAttr.PrimaryKey.id {
-                    pkNovalueFg = (item.value == nil)
-                }
-            }
-        }
-        
-        if pkNovalueFg {
+        guard let _ = getPrimaryKey(connector) else{
             return SSResult<T>(result: false)
         }
+        
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result:self.conn.update(self.makeUpdateStatement(connector,model: model), values:self.getValues(connector)))
@@ -122,6 +114,19 @@ public class SQLiteConnection{
         conn.rollback()
     }
     
+    private func getPrimaryKey(connector:SSConnector) -> SSScan? {
+        for item in connector.scans{
+            for element in item.attrs {
+                if element.id == CLAttr.PrimaryKey.id {
+                    if item.value != nil {
+                        return item
+                    }
+                }
+            }
+        }
+        return nil
+    }
+    
     private func makeUpdateStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
         var columns = String.empty
         let count = connector.scans.count{ $0.value != nil }
@@ -129,15 +134,8 @@ public class SQLiteConnection{
             let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
             columns += "\($0.element.name)=?" + separator
         }
-        let key = connector.scans.first{
-            for item in $0.attrs {
-                if item.id == CLAttr.PrimaryKey.id {
-                    return true
-                }
-            }
-            return false
-        }!
-        return "UPDATE \(model.table) SET \(columns) WHERE \(key.name)=\(key.value!);"
+        let theKey = getPrimaryKey(connector)!
+        return "UPDATE \(model.table) SET \(columns) WHERE \(theKey.name)=\(theKey.value!);"
     }
     
     private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
