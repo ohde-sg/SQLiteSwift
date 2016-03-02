@@ -84,7 +84,7 @@ public class SQLiteConnection{
         
         return executeInTransaction{
             [unowned self] in
-            return SSResult<T>(result:self.conn.update(self.makeUpdateStatement(connector,model: model), values:self.getValues(connector)))
+            return SSResult<T>(result:self.conn.update(self.makeUpdateStatement(connector,model: model), values:self.getAllValue(connector)))
         }
     }
     
@@ -129,8 +129,8 @@ public class SQLiteConnection{
     
     private func makeUpdateStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
         var columns = String.empty
-        let count = connector.scans.count{ $0.value != nil }
-        connector.scans.select{ $0.value != nil }.enumerate().forEach{
+        let count = connector.scans.count
+        connector.scans.enumerate().forEach{
             let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
             columns += "\($0.element.name)=?" + separator
         }
@@ -169,6 +169,15 @@ public class SQLiteConnection{
             }
         }
         return values
+    }
+    
+    private func getAllValue(connector:SSConnector) -> [AnyObject] {
+        return connector.scans.map{
+            if let theValue = $0.value {
+                return theValue
+            }
+            return NSNull()
+        }
     }
     
     private func makePlaceholderStatement(count:Int) -> String {

@@ -104,6 +104,7 @@ class SQLiteSwiftTests: XCTestCase {
         model.name = "none"
         model.age = 100
         model.isMan = false
+        model.nickname = nil
         
         let result2:SSResult<User> = SQLiteConnection(filePath: dbFilePath).update(model)
         XCTAssertTrue(result2.result)
@@ -113,7 +114,7 @@ class SQLiteSwiftTests: XCTestCase {
         model = result.records[0]
         XCTAssertEqual(model.name!,"none")
         XCTAssertEqual(model.age!,100)
-        XCTAssertEqual(model.nickname!,"takayan")
+        XCTAssertTrue(model.nickname == nil)
         XCTAssertEqual(model.isMan!,false)
     }
     
