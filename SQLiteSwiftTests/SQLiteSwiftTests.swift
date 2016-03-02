@@ -106,7 +106,9 @@ class SQLiteSwiftTests: XCTestCase {
         model.isMan = false
         model.nickname = nil
         
-        let result2:SSResult<User> = SQLiteConnection(filePath: dbFilePath).update(model)
+        let connection = SQLiteConnection(filePath: dbFilePath)
+        connection.isOutput = true
+        let result2:SSResult<User> = connection.update(model)
         XCTAssertTrue(result2.result)
         
         result = SQLiteConnection(filePath: dbFilePath).table()

@@ -16,6 +16,10 @@ public protocol SSMappable {
 
 public class SQLiteConnection{
     internal var conn: SQLite
+    var isOutput:Bool {
+        set{ conn.isOutput = newValue }
+        get{ return conn.isOutput }
+    }
     init(filePath:String){
         conn = SQLite(filePath)
     }

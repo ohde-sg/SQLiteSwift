@@ -23,6 +23,7 @@ class SQLite {
             }
         }
     }
+    var isOutput:Bool = false
     init(_ filePath:String){
         self.dbFilePath = filePath
     }
@@ -53,14 +54,24 @@ class SQLite {
         return executeUpdate(sql,values)
     }
     
-    func executeUpdate(sql:String, _ values: [AnyObject]!) -> Bool{
+    private func executeUpdate(sql:String, _ values: [AnyObject]!) -> Bool{
         do {
             try db.executeUpdate(sql, values: values)
+            if isOutput {
+                print("Query: \(sql)")
+            }
             return true
         } catch {
             db.rollback()
             return false;
         }
+    }
+    
+    private func executeQuery(sql:String, values:[AnyObject]!) -> FMResultSet? {
+        if isOutput {
+            print("Query: \(sql)")
+        }
+        return try? db.executeQuery(sql, values: values)
     }
     
     func beginTransaction(){
@@ -101,25 +112,23 @@ class SQLite {
         let sql = "select count(*) from sqlite_master where type='table' and name=?;"
         var rtnBl:Bool = true
         var noExistTables:[String] = []
-        do {
-            for table in tables {
-                let result: FMResultSet = try db.executeQuery(sql, values: [table])
-                defer { result.close() }
-                result.next()
-                if result.intForColumnIndex(0) == 0 {
-                    rtnBl = false
-                    noExistTables.append(table)
-                }
-                result.close()
+        for table in tables {
+            let result = executeQuery(sql, values: [table])
+            defer { result?.close() }
+            guard let theResult = result else {
+                return (false,nil)
             }
-        }catch{
-            return (false,nil)
+            theResult.next()
+            if theResult.intForColumnIndex(0) == 0 {
+                rtnBl = false
+                noExistTables.append(table)
+            }
         }
         return (!rtnBl && noExistTables.count>0) ? (false,noExistTables) : (rtnBl,nil)
     }
     
     func select(sql:String,values:[AnyObject]!) -> [[String:AnyObject]] {
-        let result = try? db.executeQuery(sql, values: values)
+        let result = executeQuery(sql, values: values)
         defer { result?.close() }
         var rtn:[[String:AnyObject]] = []
         guard let theResult = result else{
@@ -135,5 +144,7 @@ class SQLite {
         }
         return rtn
     }
-    
 }
+
+
+
