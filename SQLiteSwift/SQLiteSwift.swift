@@ -121,10 +121,8 @@ public class SQLiteConnection{
     private func getPrimaryKey(connector:SSConnector) -> SSScan? {
         for item in connector.scans{
             for element in item.attrs {
-                if element.id == CLAttr.PrimaryKey.id {
-                    if item.value != nil {
-                        return item
-                    }
+                if element == .PrimaryKey && item.value != nil{
+                    return item
                 }
             }
         }
@@ -271,22 +269,24 @@ public enum CLAttr{
     case Unique
     case Default(AnyObject)
     case Check(String)
-    
-    var id:Int {
-        switch self{
-        case .PrimaryKey:
-            return 1
-        case .AutoIncrement:
-            return 2
-        case .NotNull:
-            return 3
-        case .Unique:
-            return 4
-        case .Default:
-            return 5
-        case .Check:
-            return 6
-        }
+}
+
+public func == (lhs:CLAttr,rhs:CLAttr) -> Bool{
+    switch (lhs,rhs) {
+    case (.PrimaryKey,.PrimaryKey):
+        return true
+    case (.AutoIncrement,.AutoIncrement):
+        return true
+    case (.NotNull,.NotNull):
+        return true
+    case (.Unique,.Unique):
+        return true
+    case (.Default,.Default):
+        return true
+    case (.Check,.Check):
+        return true
+    default:
+        return false
     }
 }
 
