@@ -54,6 +54,10 @@ class SQLite {
         return executeUpdate(sql,values)
     }
     
+    func delete(sql:String,values:[AnyObject]!) -> Bool {
+        return executeUpdate(sql, values)
+    }
+    
     private func executeUpdate(sql:String, _ values: [AnyObject]!) -> Bool{
         do {
             try db.executeUpdate(sql, values: values)

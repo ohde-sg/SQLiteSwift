@@ -108,6 +108,18 @@ public class SQLiteConnection{
         }
     }
     
+    func delete<T:SSMappable>(model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.Scan)
+        model.dbMap(connector)
+        guard let theKey = getPrimaryKey(connector)?.value else{
+            return SSResult<T>(result: false)
+        }
+        return executeInTransaction{
+            [unowned self] in
+            return SSResult<T>(result:self.conn.delete(self.makeDeleteStatement(connector,model: model),values: [theKey]))
+        }
+    }
+    
     func beginTransaction(){
         conn.beginTransaction()
     }
@@ -161,6 +173,11 @@ public class SQLiteConnection{
             columns += $0.element.name + separator
         }
         return "INSERT INTO \(model.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
+    }
+    
+    private func makeDeleteStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
+        let theKey = getPrimaryKey(connector)!
+        return "DELETE FROM \(model.table) WHERE \(theKey.name)=?;"
     }
     
     private func getValues(connector:SSConnector) -> [AnyObject] {
