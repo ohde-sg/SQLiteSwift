@@ -82,13 +82,17 @@ public class SQLiteConnection{
     func update<T:SSMappable>(model:T) -> SSResult<T> {
         let connector = SSConnector(type:.Scan)
         model.dbMap(connector)
-        guard let _ = getPrimaryKey(connector) else{
+        guard let thePKey = getPrimaryKey(connector)?.value else{
             return SSResult<T>(result: false)
         }
         
         return executeInTransaction{
             [unowned self] in
-            return SSResult<T>(result:self.conn.update(self.makeUpdateStatement(connector,model: model), values:self.getAllValue(connector)))
+            var values = self.getAllValue(connector)
+            values.append(thePKey)
+            return SSResult<T>(result:self.conn.update(
+                self.makeUpdateStatement(connector,model: model),values:values)
+            )
         }
     }
     
@@ -132,10 +136,8 @@ public class SQLiteConnection{
     
     private func getPrimaryKey(connector:SSConnector) -> SSScan? {
         for item in connector.scans{
-            for element in item.attrs {
-                if element == .PrimaryKey && item.value != nil{
-                    return item
-                }
+            if item.isPrimaryKey && item.value != nil {
+                return item
             }
         }
         return nil
@@ -143,13 +145,14 @@ public class SQLiteConnection{
     
     private func makeUpdateStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
         var columns = String.empty
-        let count = connector.scans.count
-        connector.scans.enumerate().forEach{
+        let scans = removePrimaryKey(connector)
+        let count = scans.count
+        scans.enumerate().forEach{
             let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
             columns += "\($0.element.name)=?" + separator
         }
         let theKey = getPrimaryKey(connector)!
-        return "UPDATE \(model.table) SET \(columns) WHERE \(theKey.name)=\(theKey.value!);"
+        return "UPDATE \(model.table) SET \(columns) WHERE \(theKey.name)=?;"
     }
     
     private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
@@ -191,12 +194,20 @@ public class SQLiteConnection{
     }
     
     private func getAllValue(connector:SSConnector) -> [AnyObject] {
-        return connector.scans.map{
+        return removePrimaryKey(connector).map{
             if let theValue = $0.value {
                 return theValue
             }
             return NSNull()
         }
+    }
+    
+    private func removePrimaryKey(connector:SSConnector) -> [SSScan] {
+        var scans = connector.scans
+        for scan in scans.enumerate() {
+            if scan.element.isPrimaryKey { scans.removeAtIndex(scan.index) }
+        }
+        return scans
     }
     
     private func makePlaceholderStatement(count:Int) -> String {

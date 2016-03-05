@@ -71,5 +71,14 @@ public class SSScan: SSWorker{
             self.value = theLhs as? AnyObject
         }
     }
+    
+    var isPrimaryKey : Bool {
+        for attr in self.attrs {
+            if attr == .PrimaryKey {
+                return true
+            }
+        }
+        return false
+    }
 }
 

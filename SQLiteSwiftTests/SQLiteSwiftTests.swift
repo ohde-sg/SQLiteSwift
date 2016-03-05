@@ -113,6 +113,7 @@ class SQLiteSwiftTests: XCTestCase {
         
         result = SQLiteConnection(filePath: dbFilePath).table()
         
+        XCTAssertEqual(result.records.count,1)
         model = result.records[0]
         XCTAssertEqual(model.name!,"none")
         XCTAssertEqual(model.age!,100)
