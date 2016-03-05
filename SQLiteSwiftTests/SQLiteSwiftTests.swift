@@ -288,12 +288,14 @@ class SQLiteSwiftTests: XCTestCase {
         conn.deleteTable(["User"])
         conn.commit()
         
+        var result2:SSResult<User> = SQLiteConnection(filePath: dbFilePath).isExistTable()
+        XCTAssertFalse(result2.result)
+        
         let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
         XCTAssertTrue(result.result)
-        
-        conn.beginTransaction()
-        XCTAssertTrue(conn.isExistTable(["User"]).result)
-        conn.commit()
+
+        result2 = SQLiteConnection(filePath: dbFilePath).isExistTable()
+        XCTAssertTrue(result2.result)
     }
     
     func testCreateTableInTransaction() {

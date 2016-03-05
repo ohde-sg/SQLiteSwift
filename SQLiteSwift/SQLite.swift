@@ -113,7 +113,7 @@ class SQLite {
     /// - parameter table names string array
     /// - returns: false & table array on not exist , true & blank array on all tables exist
     func isExistTable(tables:[String]) -> (result:Bool,tables:[String]?) {
-        let sql = "select count(*) from sqlite_master where type='table' and name=?;"
+        let sql = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?;"
         var rtnBl:Bool = true
         var noExistTables:[String] = []
         for table in tables {

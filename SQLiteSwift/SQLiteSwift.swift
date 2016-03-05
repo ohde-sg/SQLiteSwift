@@ -9,24 +9,32 @@
 import Foundation
 
 public protocol SSMappable {
-    var table:String { get }
+    static var table:String { get }
     func dbMap(connector:SSConnector)
     init()
 }
 
 public class SQLiteConnection{
     internal var conn: SQLite
-    var isOutput:Bool {
+    public var isOutput:Bool {
         set{ conn.isOutput = newValue }
         get{ return conn.isOutput }
     }
-    init(filePath:String){
+    public init(filePath:String){
         conn = SQLite(filePath)
     }
     deinit {
         print("SQLiteConnection is deinit!!!")
     }
-    func createTable<T:SSMappable>() -> SSResult<T>{
+    
+    public func isExistTable<T:SSMappable>() -> SSResult<T> {
+        return executeInTransaction{
+            [unowned self] in
+            return SSResult<T>(result: self.conn.isExistTable([T.table]).result)
+        }
+    }
+    
+    public func createTable<T:SSMappable>() -> SSResult<T>{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
@@ -35,11 +43,10 @@ public class SQLiteConnection{
             return SSResult<T>(result: self.conn.createTable(self.makeCreateStatement(connector, model: model)))
         }
     }
-    func deleteTable<T:SSMappable>() -> SSResult<T> {
-        let model = T()
+    public func deleteTable<T:SSMappable>() -> SSResult<T> {
         return executeInTransaction{
             [unowned self] in
-            return SSResult<T>(result:self.conn.deleteTable([model.table]))
+            return SSResult<T>(result:self.conn.deleteTable([T.table]))
         }
     }
     
@@ -54,7 +61,7 @@ public class SQLiteConnection{
         return execute()
     }
     
-    func table<T:SSMappable>() -> SSTable<T>{
+    public func table<T:SSMappable>() -> SSTable<T>{
         let connector = SSConnector(type: .Map)
         return executeInTransaction{
             [unowned self] in
@@ -70,7 +77,7 @@ public class SQLiteConnection{
         }
     }
     
-    func insert<T:SSMappable>(model:T) -> SSResult<T> {
+    public func insert<T:SSMappable>(model:T) -> SSResult<T> {
         let connector = SSConnector(type:.Scan)
         model.dbMap(connector)
         return executeInTransaction{
@@ -79,7 +86,7 @@ public class SQLiteConnection{
         }
     }
     
-    func update<T:SSMappable>(model:T) -> SSResult<T> {
+    public func update<T:SSMappable>(model:T) -> SSResult<T> {
         let connector = SSConnector(type:.Scan)
         model.dbMap(connector)
         guard let thePKey = getPrimaryKey(connector)?.value else{
@@ -96,7 +103,7 @@ public class SQLiteConnection{
         }
     }
     
-    func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
+    public func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
         let connector = SSConnector(type: .Map)
         return executeInTransaction{
             [unowned self] in
@@ -112,7 +119,7 @@ public class SQLiteConnection{
         }
     }
     
-    func delete<T:SSMappable>(model:T) -> SSResult<T> {
+    public func delete<T:SSMappable>(model:T) -> SSResult<T> {
         let connector = SSConnector(type:.Scan)
         model.dbMap(connector)
         guard let theKey = getPrimaryKey(connector)?.value else{
@@ -124,13 +131,13 @@ public class SQLiteConnection{
         }
     }
     
-    func beginTransaction(){
+    public func beginTransaction(){
         conn.beginTransaction()
     }
-    func commit(){
+    public func commit(){
         conn.commit()
     }
-    func rollback(){
+    public func rollback(){
         conn.rollback()
     }
     
@@ -152,7 +159,7 @@ public class SQLiteConnection{
             columns += "\($0.element.name)=?" + separator
         }
         let theKey = getPrimaryKey(connector)!
-        return "UPDATE \(model.table) SET \(columns) WHERE \(theKey.name)=?;"
+        return "UPDATE \(T.table) SET \(columns) WHERE \(theKey.name)=?;"
     }
     
     private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
@@ -161,11 +168,11 @@ public class SQLiteConnection{
             let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
             columns += $0.element.createColumnStatement() + separator
         }
-        return "CREATE TABLE \(model.table)(\(columns));"
+        return "CREATE TABLE \(T.table)(\(columns));"
     }
     
     private func makeSelectAllStatement<T:SSMappable>(model:T) -> String {
-        return "SELECT * From \(model.table);"
+        return "SELECT * From \(T.table);"
     }
     
     private func makeInsertStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
@@ -175,12 +182,12 @@ public class SQLiteConnection{
             let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
             columns += $0.element.name + separator
         }
-        return "INSERT INTO \(model.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
+        return "INSERT INTO \(T.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
     }
     
     private func makeDeleteStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
         let theKey = getPrimaryKey(connector)!
-        return "DELETE FROM \(model.table) WHERE \(theKey.name)=?;"
+        return "DELETE FROM \(T.table) WHERE \(theKey.name)=?;"
     }
     
     private func getValues(connector:SSConnector) -> [AnyObject] {

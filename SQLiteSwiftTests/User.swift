@@ -10,7 +10,7 @@ import Foundation
 import SQLiteSwift
 
 class User: SSMappable {
-    var table:String = "User"
+    static var table:String = "User"
     var id:Int?
     var name:String?
     var age:Int?

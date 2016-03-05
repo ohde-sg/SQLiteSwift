@@ -8,6 +8,6 @@
 
 import Foundation
 
-class SSTable<T:SSMappable> {
-    var records:[T] = []
+public class SSTable<T:SSMappable> {
+    public var records:[T] = []
 }
