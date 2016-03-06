@@ -75,7 +75,7 @@ end
 
 * UPDATE
   ~~~swift
-  let table:SSResult<User> = SQLiteConnection(filePath: dbFilePath).table()
+  let table:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
   let model = table.records[0]
   model.age = 30
   model.isMan = false
