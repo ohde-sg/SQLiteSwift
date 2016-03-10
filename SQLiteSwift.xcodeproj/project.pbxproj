@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		8F7204DFE391FE22FA449EFD /* Pods_SQLiteSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D6E18B8D7466A9A1327DC4D /* Pods_SQLiteSwift.framework */; };
+		FF6622D31C91CA9700F52FF6 /* SSQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622D21C91CA9700F52FF6 /* SSQuery.swift */; };
+		FF6622D51C91CAE700F52FF6 /* SSConnector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622D41C91CAE700F52FF6 /* SSConnector.swift */; };
+		FF6622D71C91CB2A00F52FF6 /* SSWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622D61C91CB2900F52FF6 /* SSWorker.swift */; };
+		FF6622DA1C91CB6800F52FF6 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622D91C91CB6800F52FF6 /* Operators.swift */; };
+		FF6622DC1C91CB9D00F52FF6 /* SSMappable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622DB1C91CB9D00F52FF6 /* SSMappable.swift */; };
+		FF6622DE1C91D02C00F52FF6 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6622DD1C91D02C00F52FF6 /* Enums.swift */; };
 		FF66265C1C78DFA2004A0926 /* SQLiteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265B1C78DFA2004A0926 /* SQLiteTests.swift */; };
 		FF66265E1C78E2FB004A0926 /* SQLiteSwift.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */; };
 		FF6626601C790773004A0926 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF66265F1C790773004A0926 /* User.swift */; };
@@ -38,6 +44,12 @@
 		0D6E18B8D7466A9A1327DC4D /* Pods_SQLiteSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SQLiteSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E1740419EFE5C9D275D8336 /* Pods-SQLiteSwift.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLiteSwift.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SQLiteSwift/Pods-SQLiteSwift.debug.xcconfig"; sourceTree = "<group>"; };
 		A6E23A70C870FB2B940DD7D8 /* Pods-SQLiteSwift.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SQLiteSwift.release.xcconfig"; path = "Pods/Target Support Files/Pods-SQLiteSwift/Pods-SQLiteSwift.release.xcconfig"; sourceTree = "<group>"; };
+		FF6622D21C91CA9700F52FF6 /* SSQuery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSQuery.swift; sourceTree = "<group>"; };
+		FF6622D41C91CAE700F52FF6 /* SSConnector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSConnector.swift; sourceTree = "<group>"; };
+		FF6622D61C91CB2900F52FF6 /* SSWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSWorker.swift; sourceTree = "<group>"; };
+		FF6622D91C91CB6800F52FF6 /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		FF6622DB1C91CB9D00F52FF6 /* SSMappable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SSMappable.swift; sourceTree = "<group>"; };
+		FF6622DD1C91D02C00F52FF6 /* Enums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		FF66265B1C78DFA2004A0926 /* SQLiteTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteTests.swift; sourceTree = "<group>"; };
 		FF66265D1C78E2FB004A0926 /* SQLiteSwift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLiteSwift.swift; sourceTree = "<group>"; };
 		FF66265F1C790773004A0926 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -95,6 +107,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		FF6622D81C91CB3900F52FF6 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				FF6622D61C91CB2900F52FF6 /* SSWorker.swift */,
+				FF6622DB1C91CB9D00F52FF6 /* SSMappable.swift */,
+			);
+			name = Protocols;
+			sourceTree = "<group>";
+		};
 		FF831B3B1C70E05400851CE6 = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +140,7 @@
 		FF831B471C70E05400851CE6 /* SQLiteSwift */ = {
 			isa = PBXGroup;
 			children = (
+				FF6622D81C91CB3900F52FF6 /* Protocols */,
 				FFB0F3C61C799C5F00D374C2 /* Extensions */,
 				FF831B481C70E05400851CE6 /* SQLiteSwift.h */,
 				FF831B4A1C70E05400851CE6 /* Info.plist */,
@@ -128,6 +150,10 @@
 				FFCAB9001C7974220040D64B /* SSScan.swift */,
 				FFAFC5131C79CA660007795C /* SSTable.swift */,
 				FFAFC5151C79E8060007795C /* SSResult.swift */,
+				FF6622D21C91CA9700F52FF6 /* SSQuery.swift */,
+				FF6622D41C91CAE700F52FF6 /* SSConnector.swift */,
+				FF6622D91C91CB6800F52FF6 /* Operators.swift */,
+				FF6622DD1C91D02C00F52FF6 /* Enums.swift */,
 			);
 			path = SQLiteSwift;
 			sourceTree = "<group>";
@@ -301,10 +327,16 @@
 				FFCAB8FF1C7973FF0040D64B /* SSMap.swift in Sources */,
 				FFDD55221C81E438008F8887 /* SequenceTypeExtensions.swift in Sources */,
 				FF831B601C70E07600851CE6 /* SQLite.swift in Sources */,
+				FF6622DE1C91D02C00F52FF6 /* Enums.swift in Sources */,
 				FFB0F3C81C799CAA00D374C2 /* StringExtensions.swift in Sources */,
+				FF6622DA1C91CB6800F52FF6 /* Operators.swift in Sources */,
 				FFAFC5161C79E8060007795C /* SSResult.swift in Sources */,
 				FFCAB9011C7974220040D64B /* SSScan.swift in Sources */,
+				FF6622D71C91CB2A00F52FF6 /* SSWorker.swift in Sources */,
+				FF6622DC1C91CB9D00F52FF6 /* SSMappable.swift in Sources */,
+				FF6622D51C91CAE700F52FF6 /* SSConnector.swift in Sources */,
 				FF66265E1C78E2FB004A0926 /* SQLiteSwift.swift in Sources */,
+				FF6622D31C91CA9700F52FF6 /* SSQuery.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

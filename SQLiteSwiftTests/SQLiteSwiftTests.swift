@@ -38,32 +38,10 @@ class SQLiteSwiftTests: XCTestCase {
         super.tearDown()
     }
     
-    func testSample() {
-        let connector = SQLiteConnection(filePath: dbFilePath)
-        let scan:(SSConnector,User) = connector.scan()
-        var values = ["id":(CLType.CL_Integer,[CLAttr.PrimaryKey,CLAttr.AutoIncrement, .NotNull]),
-            "name":(CLType.CL_Text,[CLAttr.Unique]),
-            "age" : (CLType.CL_Integer,[CLAttr.Check("age>0")]),
-            "nickname":(CLType.CL_Text,[CLAttr.Default("None")]),
-            "isMan":(CLType.CL_Integer,[]),]
-        for item in scan.0.scans {
-            //Assert type of Column
-            XCTAssertEqual(item.type!, values[item.name]!.0)
-            //Assert count of attributes
-            XCTAssertEqual(values[item.name]!.1.count,item.attrs.count)
-            //Assert type of attributes
-            for (index,value) in  values[item.name]!.1.enumerate() {
-                XCTAssertEqual(String(item.attrs[index]),String(value))
-            }
-        }
-        let map:User = SQLiteConnection(filePath: dbFilePath).mapping()
-        print(map.id,map.name,map.nickname,map.isMan)
-    }
-    
     func testTable(){
         //Create User Table if User Table is not exist
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         let params = [
             ["27","takasi","takayan","1"],
             ["20","hanako","hanatyan","0"],
@@ -75,7 +53,7 @@ class SQLiteSwiftTests: XCTestCase {
         }
         conn.commit()
         
-        let results:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let results = SQLiteConnection(filePath: dbFilePath).table(User)
         XCTAssertEqual(results.records.count,params.count)
         
         for result in results.records.enumerate() {
@@ -88,8 +66,8 @@ class SQLiteSwiftTests: XCTestCase {
     
     func testUpdate(){
         //Create User Table if User Table is not exist
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         let params = [
             ["27","takasi","takayan","1"]
         ]
@@ -99,7 +77,7 @@ class SQLiteSwiftTests: XCTestCase {
         }
         conn.commit()
         
-        var result:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        var result = SQLiteConnection(filePath: dbFilePath).table(User)
         var model = result.records[0]
         model.name = "none"
         model.age = 100
@@ -108,10 +86,10 @@ class SQLiteSwiftTests: XCTestCase {
         
         let connection = SQLiteConnection(filePath: dbFilePath)
         connection.isOutput = true
-        let result2:SSResult<User> = connection.update(model)
+        let result2 = connection.update(model)
         XCTAssertTrue(result2.result)
         
-        result = SQLiteConnection(filePath: dbFilePath).table()
+        result = SQLiteConnection(filePath: dbFilePath).table(User)
         
         XCTAssertEqual(result.records.count,1)
         model = result.records[0]
@@ -122,8 +100,8 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testQuery(){
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         let params = [
             ["21","takasi","takayan","1"],
             ["25","hanako","hanatyan","0"],
@@ -137,7 +115,7 @@ class SQLiteSwiftTests: XCTestCase {
         
         let query = "SELECT name, age FROM User WHERE age>? AND age<?;"
         let values = [21,30]
-        let result:SSTable<User> = SQLiteConnection(filePath: dbFilePath).query(query, params: values)
+        let result = SQLiteConnection(filePath: dbFilePath).query(User).exec(query,values)
         
         XCTAssertEqual(result.records.count,1)
         let element = result.records[0]
@@ -147,8 +125,8 @@ class SQLiteSwiftTests: XCTestCase {
 
     
     func testQueryInTransaction(){
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         let params = [
             ["21","takasi","takayan","1"],
             ["25","hanako","hanatyan","0"],
@@ -164,19 +142,19 @@ class SQLiteSwiftTests: XCTestCase {
         let query = "SELECT name, age FROM User WHERE age>? AND age<?;"
         let values = [21,30]
         connect.beginTransaction()
-        let result:SSTable<User> = connect.query(query, params: values)
+        let result = connect.query(User).exec(query,values)
         
         let user = User()
         user.name = "hoge"
         user.age = 23
-        let dmResult:SSResult<User> = connect.insert(user)
+        let dmResult = connect.insert(user)
         XCTAssertTrue(dmResult.result)
-        let dmResult2:SSTable<User> = connect.table()
+        let dmResult2 = connect.table(User)
         XCTAssertEqual(dmResult2.records.count,4)
         
         connect.commit()
         
-        let dmResult3:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let dmResult3 = SQLiteConnection(filePath: dbFilePath).table(User)
         XCTAssertEqual(dmResult3.records.count,4)
         
         let element = result.records[0]
@@ -185,8 +163,8 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testInsert(){
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         
         let user = User()
         user.name = "takashi"
@@ -203,10 +181,10 @@ class SQLiteSwiftTests: XCTestCase {
         let users:[User] = [user,user2]
         
         users.enumerate().forEach{
-            let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).insert($0.element)
+            let result = SQLiteConnection(filePath: dbFilePath).insert($0.element)
             XCTAssertTrue(result.result)
         }
-        let results:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let results = SQLiteConnection(filePath: dbFilePath).table(User)
         results.records.enumerate().forEach{
             XCTAssertEqual($0.element.name!, users[$0.index].name)
             XCTAssertEqual($0.element.age!, users[$0.index].age)
@@ -217,8 +195,8 @@ class SQLiteSwiftTests: XCTestCase {
     
     func testDelete(){
         //Create User Table if User Table is not exist
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         let params = [
             ["27","takasi","takayan","1"],
             ["20","hanako","hanatyan","0"],
@@ -230,14 +208,14 @@ class SQLiteSwiftTests: XCTestCase {
         }
         conn.commit()
         
-        let result:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let result = SQLiteConnection(filePath: dbFilePath).table(User)
         let model = result.records[1]
         let connetor = SQLiteConnection(filePath: dbFilePath)
         connetor.isOutput = true
         let result2 = connetor.delete(model)
         XCTAssertTrue(result2.result)
         
-        let result3:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let result3 = SQLiteConnection(filePath: dbFilePath).table(User)
         XCTAssertEqual(result3.records.count, params.count - 1)
         for item in result3.records {
             XCTAssertTrue(item.id != model.id)
@@ -245,8 +223,8 @@ class SQLiteSwiftTests: XCTestCase {
     }
     
     func testInsertInTransaction(){
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).deleteTable()
-        let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let _ = SQLiteConnection(filePath: dbFilePath).deleteTable(User)
+        let _ = SQLiteConnection(filePath: dbFilePath).createTable(User)
         
         let user = User()
         user.name = "takashi"
@@ -265,16 +243,16 @@ class SQLiteSwiftTests: XCTestCase {
         let connection = SQLiteConnection(filePath: dbFilePath)
         connection.beginTransaction()
         users.enumerate().forEach{
-            let result:SSResult<User> = connection.insert($0.element)
+            let result = connection.insert($0.element)
             XCTAssertTrue(result.result)
         }
         //still uncomitt, so result of select is 0 count
-        let tmpResult:SSTable<User> = connection.table()
+        let tmpResult = connection.table(User)
         XCTAssertEqual(tmpResult.records.count,2)
         
         connection.commit()
         
-        let results:SSTable<User> = SQLiteConnection(filePath: dbFilePath).table()
+        let results = SQLiteConnection(filePath: dbFilePath).table(User)
         results.records.enumerate().forEach{
             XCTAssertEqual($0.element.name!, users[$0.index].name)
             XCTAssertEqual($0.element.age!, users[$0.index].age)
@@ -288,13 +266,13 @@ class SQLiteSwiftTests: XCTestCase {
         conn.deleteTable(["User"])
         conn.commit()
         
-        var result2:SSResult<User> = SQLiteConnection(filePath: dbFilePath).isExistTable()
+        var result2 = SQLiteConnection(filePath: dbFilePath).isExistTable(User)
         XCTAssertFalse(result2.result)
         
-        let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
+        let result = SQLiteConnection(filePath: dbFilePath).createTable(User)
         XCTAssertTrue(result.result)
 
-        result2 = SQLiteConnection(filePath: dbFilePath).isExistTable()
+        result2 = SQLiteConnection(filePath: dbFilePath).isExistTable(User)
         XCTAssertTrue(result2.result)
     }
     
@@ -302,12 +280,12 @@ class SQLiteSwiftTests: XCTestCase {
         let connector = SQLiteConnection(filePath: dbFilePath);
         
         connector.beginTransaction()
-        let result:SSResult<User> = connector.deleteTable()
+        let result = connector.deleteTable(User)
         XCTAssertTrue(result.result)
         connector.commit()
         
         connector.beginTransaction()
-        let result2:SSResult<User> = connector.createTable()
+        let result2 = connector.createTable(User)
         XCTAssertTrue(result2.result)
         connector.commit()
         
@@ -320,6 +298,7 @@ class SQLiteSwiftTests: XCTestCase {
         // This is an example of a performance test case.
         self.measureBlock {
             // Put the code you want to measure the time of here.
+            self.testInsertInTransaction()
         }
     }
     

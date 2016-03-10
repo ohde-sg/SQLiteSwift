@@ -8,12 +8,6 @@
 
 import Foundation
 
-public protocol SSMappable {
-    static var table:String { get }
-    func dbMap(connector:SSConnector)
-    init()
-}
-
 public class SQLiteConnection{
     internal var conn: SQLite
     public var isOutput:Bool {
@@ -27,14 +21,14 @@ public class SQLiteConnection{
         print("SQLiteConnection is deinit!!!")
     }
     
-    public func isExistTable<T:SSMappable>() -> SSResult<T> {
+    public func isExistTable<T:SSMappable>(type:T.Type) -> SSResult<T> {
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result: self.conn.isExistTable([T.table]).result)
         }
     }
     
-    public func createTable<T:SSMappable>() -> SSResult<T>{
+    public func createTable<T:SSMappable>(type:T.Type) -> SSResult<T>{
         let model = T()
         let connector = SSConnector(type: .Scan)
         model.dbMap(connector)
@@ -43,7 +37,7 @@ public class SQLiteConnection{
             return SSResult<T>(result: self.conn.createTable(self.makeCreateStatement(connector, model: model)))
         }
     }
-    public func deleteTable<T:SSMappable>() -> SSResult<T> {
+    public func deleteTable<T:SSMappable>(type:T.Type) -> SSResult<T> {
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result:self.conn.deleteTable([T.table]))
@@ -61,7 +55,7 @@ public class SQLiteConnection{
         return execute()
     }
     
-    public func table<T:SSMappable>() -> SSTable<T>{
+    public func table<T:SSMappable>(type: T.Type) -> SSTable<T>{
         let connector = SSConnector(type: .Map)
         return executeInTransaction{
             [unowned self] in
@@ -102,21 +96,24 @@ public class SQLiteConnection{
             )
         }
     }
-    
-    public func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
+
+    public func query<T:SSMappable>(tyep:T.Type) -> SSQuery<T> {
         let connector = SSConnector(type: .Map)
-        return executeInTransaction{
-            [unowned self] in
-            let table = SSTable<T>()
-            let results = self.conn.select(query, values: params)
-            for result in results {
-                connector.values = result
-                let model = T()
-                model.dbMap(connector)
-                table.records.append(model)
-            }
-            return table
-        }
+        return SSQuery(
+            exec: { (query,params) -> SSTable<T> in
+                return self.executeInTransaction{
+                    [unowned self] in
+                    let table = SSTable<T>()
+                    let results = self.conn.select(query, values: params)
+                    for result in results {
+                        connector.values = result
+                        let model = T()
+                        model.dbMap(connector)
+                        table.records.append(model)
+                    }
+                    return table
+                }
+        })
     }
     
     public func delete<T:SSMappable>(model:T) -> SSResult<T> {
@@ -234,106 +231,4 @@ public class SQLiteConnection{
         model.dbMap(connector)
         return (connector,model)
     }
-    func mapping<T:SSMappable>() -> T{
-        let model = T()
-        let connector = SSConnector(type: .Scan)
-        model.dbMap(connector)
-        var values:[String:AnyObject] = [:]
-        for item in connector.scans.enumerate() {
-            switch item.element.type! {
-            case .CL_Integer:
-                values[item.element.name] = 0
-            case .CL_Text:
-                values[item.element.name] = "sample\(item.index)"
-            default:
-                break
-            }
-        }
-        connector.values = values
-        connector.type = .Map
-        model.dbMap(connector)
-        return model
-    }
 }
-
-/// Use for let work to column. e.g) scan column info, mapping value to column variables
-public protocol SSWorker{
-    var value: AnyObject? { get set }
-    func work<T>(inout lhs:T?)
-}
-
-public class SSConnector {
-    var values:[String:AnyObject?]=[:]
-    var scans:[SSScan] = []
-    var type:SSType
-    public init(type:SSType){
-        self.type = type
-    }
-    public subscript (name:String,attrs:CLAttr...) -> SSWorker{
-        switch self.type {
-        case .Map:  // return map worker
-            let map = SSMap()
-            if let theValue = values[name]{
-                map.value = theValue
-            }
-            return map
-        case .Scan: // return scan worker
-            let scan = SSScan(name,attrs: attrs)
-            scans.append(scan)
-            return scan
-        }
-    }
-}
-
-public enum SSType {
-    case Scan
-    case Map
-}
-
-public enum CLType{
-    case CL_Integer
-    case CL_Text
-    case CL_Real
-//    case CL_BLOB
-}
-
-public enum CLAttr{
-    case PrimaryKey
-    case AutoIncrement
-    case NotNull
-    case Unique
-    case Default(AnyObject)
-    case Check(String)
-}
-
-public func == (lhs:CLAttr,rhs:CLAttr) -> Bool{
-    switch (lhs,rhs) {
-    case (.PrimaryKey,.PrimaryKey):
-        return true
-    case (.AutoIncrement,.AutoIncrement):
-        return true
-    case (.NotNull,.NotNull):
-        return true
-    case (.Unique,.Unique):
-        return true
-    case (.Default,.Default):
-        return true
-    case (.Check,.Check):
-        return true
-    default:
-        return false
-    }
-}
-
-infix operator <- {
-    precedence 20
-    associativity none
-}
-
-public func <- <T>(inout lhs:T?,rhs:SSWorker){
-    rhs.work(&lhs)
-}
-
-
-
-
