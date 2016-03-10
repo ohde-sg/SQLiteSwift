@@ -224,11 +224,4 @@ public class SQLiteConnection{
         }
         return rtn
     }
-    
-    func scan<T:SSMappable>() -> (SSConnector,T){
-        let model = T()
-        let connector = SSConnector(type: .Scan)
-        model.dbMap(connector)
-        return (connector,model)
-    }
 }
