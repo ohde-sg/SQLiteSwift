@@ -12,7 +12,7 @@ extension SequenceType {
     func count(judge:(Self.Generator.Element) -> Bool) -> Int {
         var count = 0
         for item in self {
-            if judge(item) { count++ }
+            if judge(item) { count += 1 }
         }
         return count
     }
