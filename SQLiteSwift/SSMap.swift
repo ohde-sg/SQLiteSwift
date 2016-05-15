@@ -10,10 +10,21 @@ import Foundation
 
 public class SSMap: SSWorker{
     public var value : AnyObject?
-    public func work<T>(inout lhs: T?) {
-        if lhs is Bool {
-            let val:Int = self.value as! Int
+    public func work<T>(inout lhs: T?){
+        
+        guard let theValue = self.value else {
+            return
+        }
+        
+        if theValue is NSNull {
+           return
+        }
+        
+        if lhs.dynamicType == Optional<Bool>.self {
+            let val = theValue as? Int
             lhs = (val != 0) as? T
+        }else if lhs.dynamicType == Optional<String>.self {
+            lhs = String(theValue) as? T
         }else{
             lhs = self.value as? T
         }

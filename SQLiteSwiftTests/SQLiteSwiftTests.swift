@@ -189,7 +189,7 @@ class SQLiteSwiftTests: XCTestCase {
         let _:SSResult<User> = SQLiteConnection(filePath: dbFilePath).createTable()
         
         let user = User()
-        user.name = "takashi"
+        user.name = "123"
         user.age = 27
         user.nickname = "takayan"
         user.isMan = true

@@ -47,11 +47,11 @@ public class SSScan: SSWorker{
     }
     
     public func work<T>(inout lhs: T?) {
-        if lhs is Int? {
+        if lhs.dynamicType == Optional<Int>.self {
             self.type = CLType.CL_Integer
             self.value = lhs as? AnyObject
         }
-        if lhs is Bool? {
+        if lhs.dynamicType == Optional<Bool>.self {
             self.type = CLType.CL_Integer
             if let theLhs = lhs {
                 self.value = theLhs as! Bool ? 1 : 0
@@ -59,11 +59,11 @@ public class SSScan: SSWorker{
             return
         }
         //Real
-        if lhs is Double? || lhs is Float?{
+        if lhs.dynamicType == Optional<Double>.self || lhs.dynamicType == Optional<Float>.self {
             self.type = CLType.CL_Real
         }
         //Text
-        if lhs is String? {
+        if lhs.dynamicType == Optional<String>.self {
             self.type = CLType.CL_Text
         }
         
