@@ -10,10 +10,10 @@ import Foundation
 import FMDB
 
 class SQLite {
-    static private var conn: SQLite?
-    private let dbFilePath: String
-    private var _db:FMDatabase?
-    private var db: FMDatabase {
+    static fileprivate var conn: SQLite?
+    fileprivate let dbFilePath: String
+    fileprivate var _db:FMDatabase?
+    fileprivate var db: FMDatabase {
         get {
             if let tmpDb = _db {
                 return tmpDb
@@ -31,11 +31,11 @@ class SQLite {
     /// Create Table according to sql parameter
     /// - parameter sql: sql statement
     /// - returns: true on Success, false on Failure
-    func createTable(sql:String) -> Bool {
+    func createTable(_ sql:String) -> Bool {
         return executeUpdate(sql,nil)
     }
     
-    func deleteTable(tables:[String]) -> Bool {
+    func deleteTable(_ tables:[String]) -> Bool {
         let sql = "DROP TABLE IF EXISTS"
         var result:Bool = true
         tables.forEach{
@@ -46,19 +46,19 @@ class SQLite {
         return result
     }
     
-    func insert(sql:String,values:[AnyObject]!) -> Bool {
+    func insert(_ sql:String,values:[AnyObject]!) -> Bool {
         return executeUpdate(sql,values)
     }
     
-    func update(sql:String,values:[AnyObject]!) -> Bool {
+    func update(_ sql:String,values:[AnyObject]!) -> Bool {
         return executeUpdate(sql,values)
     }
     
-    func delete(sql:String,values:[AnyObject]!) -> Bool {
+    func delete(_ sql:String,values:[AnyObject]!) -> Bool {
         return executeUpdate(sql, values)
     }
     
-    private func executeUpdate(sql:String, _ values: [AnyObject]!) -> Bool{
+    fileprivate func executeUpdate(_ sql:String, _ values: [AnyObject]!) -> Bool{
         do {
             try db.executeUpdate(sql, values: values)
             if isOutput {
@@ -71,7 +71,7 @@ class SQLite {
         }
     }
     
-    private func executeQuery(sql:String, values:[AnyObject]!) -> FMResultSet? {
+    fileprivate func executeQuery(_ sql:String, values:[AnyObject]!) -> FMResultSet? {
         if isOutput {
             print("Query: \(sql)")
         }
@@ -79,25 +79,25 @@ class SQLite {
     }
     
     func beginTransaction(){
-        if !db.inTransaction() {
+        if !db.isInTransaction {
             db.open()
             db.beginTransaction()
         }
     }
     
     var inTransaction:Bool {
-        return db.inTransaction()
+        return db.isInTransaction
     }
     
     func commit() {
-        if db.inTransaction() {
+        if db.isInTransaction {
             db.commit()
             db.close()
         }
     }
     
     func rollback(){
-        if db.inTransaction() {
+        if db.isInTransaction {
             db.rollback()
         }
     }
@@ -105,25 +105,25 @@ class SQLite {
     /// Return whether DBFile is exist
     /// - returns: true on exist, false on not exist
     func isExistDBFile() -> Bool {
-        let fileManager: NSFileManager = NSFileManager.defaultManager()
-        return fileManager.fileExistsAtPath(self.dbFilePath)
+        let fileManager: FileManager = FileManager.default
+        return fileManager.fileExists(atPath: self.dbFilePath)
     }
     
     /// Return whether Tables are exist
     /// - parameter table names string array
     /// - returns: false & table array on not exist , true & blank array on all tables exist
-    func isExistTable(tables:[String]) -> (result:Bool,tables:[String]?) {
+    func isExistTable(_ tables:[String]) -> (result:Bool,tables:[String]?) {
         let sql = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?;"
         var rtnBl:Bool = true
         var noExistTables:[String] = []
         for table in tables {
-            let result = executeQuery(sql, values: [table])
+            let result = executeQuery(sql, values: [table as AnyObject])
             defer { result?.close() }
             guard let theResult = result else {
                 return (false,nil)
             }
             theResult.next()
-            if theResult.intForColumnIndex(0) == 0 {
+            if theResult.int(forColumnIndex: 0) == 0 {
                 rtnBl = false
                 noExistTables.append(table)
             }
@@ -131,7 +131,7 @@ class SQLite {
         return (!rtnBl && noExistTables.count>0) ? (false,noExistTables) : (rtnBl,nil)
     }
     
-    func select(sql:String,values:[AnyObject]!) -> [[String:AnyObject]] {
+    func select(_ sql:String,values:[AnyObject]!) -> [[String:AnyObject]] {
         let result = executeQuery(sql, values: values)
         defer { result?.close() }
         var rtn:[[String:AnyObject]] = []
@@ -140,11 +140,13 @@ class SQLite {
         }
         while  theResult.next() {
             var dict:[String:AnyObject] = [:]
-            for(key,value) in theResult.resultDictionary() {
-                let theKey = key as! String
-                dict[theKey] = value
+            if let resultDictionary = theResult.resultDictionary {
+                for(key,value) in resultDictionary {
+                    let theKey = key as! String
+                    dict[theKey] = value as AnyObject
+                }
+                rtn.append(dict)
             }
-            rtn.append(dict)
         }
         return rtn
     }

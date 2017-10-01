@@ -8,9 +8,9 @@
 
 import Foundation
 
-public class SSMap: SSWorker{
-    public var value : AnyObject?
-    public func work<T>(inout lhs: T?){
+open class SSMap: SSWorker{
+    open var value : AnyObject?
+    open func work<T>(_ lhs: inout T?){
         
         guard let theValue = self.value else {
             return
@@ -20,11 +20,11 @@ public class SSMap: SSWorker{
            return
         }
         
-        if lhs.dynamicType == Optional<Bool>.self {
+        if type(of: lhs) == Optional<Bool>.self {
             let val = theValue as? Int
             lhs = (val != 0) as? T
-        }else if lhs.dynamicType == Optional<String>.self {
-            lhs = String(theValue) as? T
+        }else if type(of: lhs) == Optional<String>.self {
+            lhs = String(describing: theValue) as? T
         }else{
             lhs = self.value as? T
         }

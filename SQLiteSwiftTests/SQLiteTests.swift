@@ -11,15 +11,15 @@ import XCTest
 
 class SQLiteTests: XCTestCase {
     let dbFile:String = "sqliteswift.db"
-    let dir = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
-    private var dbFilePath: String {
+    let dir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+    fileprivate var dbFilePath: String {
         get{
             return self.dir + "/" + self.dbFile
         }
     }
     
     var _conn :SQLite?
-    private var conn: SQLite{
+    fileprivate var conn: SQLite{
         if _conn == nil {
             _conn = SQLite(self.dbFilePath)
             return _conn!
@@ -77,7 +77,7 @@ class SQLiteTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }

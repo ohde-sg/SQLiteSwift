@@ -8,10 +8,10 @@
 
 import Foundation
 
-public class SSScan: SSWorker{
+open class SSScan: SSWorker{
     var attrs:[CLAttr]
     var type: CLType?
-    public var value:AnyObject?
+    open var value:AnyObject?
     var name:String
     init(_ name:String, attrs:[CLAttr]){
         self.name = name
@@ -20,61 +20,61 @@ public class SSScan: SSWorker{
     func createColumnStatement() -> String{
         var statement = name
         switch type! {
-        case .CL_Integer:
+        case .cl_Integer:
             statement += String.whiteSpace + "INTEGER"
-        case .CL_Text:
+        case .cl_Text:
             statement += String.whiteSpace + "TEXT"
-        case .CL_Real:
+        case .cl_Real:
             statement += String.whiteSpace + "REAL"
         }
         for item in attrs {
             switch item {
-            case .AutoIncrement:
+            case .autoIncrement:
                 statement += String.whiteSpace + "AUTOINCREMENT"
-            case .PrimaryKey:
+            case .primaryKey:
                 statement += String.whiteSpace + "PRIMARY KEY"
-            case .NotNull:
+            case .notNull:
                 statement += String.whiteSpace + "NOT NULL"
-            case .Unique:
+            case .unique:
                 statement += String.whiteSpace + "UNIQUE"
-            case .Default(let value):
+            case .default(let value):
                 statement += String.whiteSpace + "DEFAULT \(value)"
-            case .Check(let value):
+            case .check(let value):
                 statement += String.whiteSpace + "CHECK(\(value))"
             }
         }
         return statement
     }
     
-    public func work<T>(inout lhs: T?) {
-        if lhs.dynamicType == Optional<Int>.self {
-            self.type = CLType.CL_Integer
-            self.value = lhs as? AnyObject
+    open func work<T>(_ lhs: inout T?) {
+        if type(of: lhs) == Optional<Int>.self {
+            self.type = CLType.cl_Integer
+            self.value = lhs as AnyObject
         }
-        if lhs.dynamicType == Optional<Bool>.self {
-            self.type = CLType.CL_Integer
+        if type(of: lhs) == Optional<Bool>.self {
+            self.type = CLType.cl_Integer
             if let theLhs = lhs {
-                self.value = theLhs as! Bool ? 1 : 0
+                self.value = (theLhs as! Bool ? 1 : 0 ) as AnyObject
             }
             return
         }
         //Real
-        if lhs.dynamicType == Optional<Double>.self || lhs.dynamicType == Optional<Float>.self {
-            self.type = CLType.CL_Real
+        if type(of: lhs) == Optional<Double>.self || type(of: lhs) == Optional<Float>.self {
+            self.type = CLType.cl_Real
         }
         //Text
-        if lhs.dynamicType == Optional<String>.self {
-            self.type = CLType.CL_Text
+        if type(of: lhs) == Optional<String>.self {
+            self.type = CLType.cl_Text
         }
         
         if let theLhs = lhs {
-            self.value = theLhs as? AnyObject
+            self.value = theLhs as AnyObject
         }
     }
     
     var isPrimaryKey : Bool {
         for attr in self.attrs {
-            if attr == .PrimaryKey {
+            if attr == .primaryKey {
                 return true
             }
         }

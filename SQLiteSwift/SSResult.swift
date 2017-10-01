@@ -8,8 +8,8 @@
 
 import Foundation
 
-public class SSResult<T:SSMappable> {
-    public var result:Bool
+open class SSResult<T:SSMappable> {
+    open var result:Bool
     init(result:Bool){
         self.result = result
     }

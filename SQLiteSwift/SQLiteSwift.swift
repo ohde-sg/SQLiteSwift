@@ -10,13 +10,13 @@ import Foundation
 
 public protocol SSMappable {
     static var table:String { get }
-    func dbMap(connector:SSConnector)
+    func dbMap(_ connector:SSConnector)
     init()
 }
 
-public class SQLiteConnection{
+open class SQLiteConnection{
     internal var conn: SQLite
-    public var isOutput:Bool {
+    open var isOutput:Bool {
         set{ conn.isOutput = newValue }
         get{ return conn.isOutput }
     }
@@ -27,30 +27,30 @@ public class SQLiteConnection{
         print("SQLiteConnection is deinit!!!")
     }
     
-    public func isExistTable<T:SSMappable>() -> SSResult<T> {
+    open func isExistTable<T:SSMappable>() -> SSResult<T> {
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result: self.conn.isExistTable([T.table]).result)
         }
     }
     
-    public func createTable<T:SSMappable>() -> SSResult<T>{
+    open func createTable<T:SSMappable>() -> SSResult<T>{
         let model = T()
-        let connector = SSConnector(type: .Scan)
+        let connector = SSConnector(type: .scan)
         model.dbMap(connector)
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result: self.conn.createTable(self.makeCreateStatement(connector, model: model)))
         }
     }
-    public func deleteTable<T:SSMappable>() -> SSResult<T> {
+    open func deleteTable<T:SSMappable>() -> SSResult<T> {
         return executeInTransaction{
             [unowned self] in
             return SSResult<T>(result:self.conn.deleteTable([T.table]))
         }
     }
     
-    private func executeInTransaction<T>(execute:()->T) -> T{
+    fileprivate func executeInTransaction<T>(_ execute:()->T) -> T{
         if !conn.inTransaction {
             conn.beginTransaction()
             defer {
@@ -61,8 +61,8 @@ public class SQLiteConnection{
         return execute()
     }
     
-    public func table<T:SSMappable>() -> SSTable<T>{
-        let connector = SSConnector(type: .Map)
+    open func table<T:SSMappable>() -> SSTable<T>{
+        let connector = SSConnector(type: .map)
         return executeInTransaction{
             [unowned self] in
             let table = SSTable<T>()
@@ -77,8 +77,8 @@ public class SQLiteConnection{
         }
     }
     
-    public func insert<T:SSMappable>(model:T) -> SSResult<T> {
-        let connector = SSConnector(type:.Scan)
+    open func insert<T:SSMappable>(_ model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.scan)
         model.dbMap(connector)
         return executeInTransaction{
             [unowned self] in
@@ -86,8 +86,8 @@ public class SQLiteConnection{
         }
     }
     
-    public func update<T:SSMappable>(model:T) -> SSResult<T> {
-        let connector = SSConnector(type:.Scan)
+    open func update<T:SSMappable>(_ model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.scan)
         model.dbMap(connector)
         guard let thePKey = getPrimaryKey(connector)?.value else{
             return SSResult<T>(result: false)
@@ -103,8 +103,8 @@ public class SQLiteConnection{
         }
     }
     
-    public func query<T:SSMappable>(query:String,params:[AnyObject]) -> SSTable<T>{
-        let connector = SSConnector(type: .Map)
+    open func query<T:SSMappable>(_ query:String,params:[AnyObject]) -> SSTable<T>{
+        let connector = SSConnector(type: .map)
         return executeInTransaction{
             [unowned self] in
             let table = SSTable<T>()
@@ -119,8 +119,8 @@ public class SQLiteConnection{
         }
     }
     
-    public func delete<T:SSMappable>(model:T) -> SSResult<T> {
-        let connector = SSConnector(type:.Scan)
+    open func delete<T:SSMappable>(_ model:T) -> SSResult<T> {
+        let connector = SSConnector(type:.scan)
         model.dbMap(connector)
         guard let theKey = getPrimaryKey(connector)?.value else{
             return SSResult<T>(result: false)
@@ -131,17 +131,17 @@ public class SQLiteConnection{
         }
     }
     
-    public func beginTransaction(){
+    open func beginTransaction(){
         conn.beginTransaction()
     }
-    public func commit(){
+    open func commit(){
         conn.commit()
     }
-    public func rollback(){
+    open func rollback(){
         conn.rollback()
     }
     
-    private func getPrimaryKey(connector:SSConnector) -> SSScan? {
+    fileprivate func getPrimaryKey(_ connector:SSConnector) -> SSScan? {
         for item in connector.scans{
             if item.isPrimaryKey && item.value != nil {
                 return item
@@ -150,49 +150,49 @@ public class SQLiteConnection{
         return nil
     }
     
-    private func makeUpdateStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
+    fileprivate func makeUpdateStatement<T:SSMappable>(_ connector:SSConnector, model:T) -> String {
         var columns = String.empty
         let scans = removePrimaryKey(connector)
         let count = scans.count
-        scans.enumerate().forEach{
-            let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
+        scans.enumerated().forEach{
+            let separator = count-1 == $0.offset ? String.empty : ","+String.whiteSpace
             columns += "\($0.element.name)=?" + separator
         }
         let theKey = getPrimaryKey(connector)!
         return "UPDATE \(T.table) SET \(columns) WHERE \(theKey.name)=?;"
     }
     
-    private func makeCreateStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
+    fileprivate func makeCreateStatement<T:SSMappable>(_ connector:SSConnector,model:T) -> String {
         var columns:String = String.empty
-        connector.scans.enumerate().forEach{
-            let separator = (connector.scans.count-1) == $0.index ? String.empty : ","+String.whiteSpace
+        connector.scans.enumerated().forEach{
+            let separator = (connector.scans.count-1) == $0.offset ? String.empty : ","+String.whiteSpace
             columns += $0.element.createColumnStatement() + separator
         }
         return "CREATE TABLE \(T.table)(\(columns));"
     }
     
-    private func makeSelectAllStatement<T:SSMappable>(model:T) -> String {
+    fileprivate func makeSelectAllStatement<T:SSMappable>(_ model:T) -> String {
         return "SELECT * From \(T.table);"
     }
     
-    private func makeInsertStatement<T:SSMappable>(connector:SSConnector, model:T) -> String {
+    fileprivate func makeInsertStatement<T:SSMappable>(_ connector:SSConnector, model:T) -> String {
         var columns = String.empty
         let count = connector.scans.count{ $0.value != nil }
-        connector.scans.select{ $0.value != nil }.enumerate().forEach{
-            let separator = count-1 == $0.index ? String.empty : ","+String.whiteSpace
+        connector.scans.select{ $0.value != nil }.enumerated().forEach{
+            let separator = count-1 == $0.offset ? String.empty : ","+String.whiteSpace
             columns += $0.element.name + separator
         }
         return "INSERT INTO \(T.table)(\(columns)) VALUES(\(makePlaceholderStatement(count)));"
     }
     
-    private func makeDeleteStatement<T:SSMappable>(connector:SSConnector,model:T) -> String {
+    fileprivate func makeDeleteStatement<T:SSMappable>(_ connector:SSConnector,model:T) -> String {
         let theKey = getPrimaryKey(connector)!
         return "DELETE FROM \(T.table) WHERE \(theKey.name)=?;"
     }
     
-    private func getValues(connector:SSConnector) -> [AnyObject] {
+    fileprivate func getValues(_ connector:SSConnector) -> [AnyObject] {
         var values: [AnyObject] = []
-        connector.scans.enumerate().forEach{
+        connector.scans.enumerated().forEach{
             if let theValue = $0.element.value {
                 values.append(theValue)
             }
@@ -200,7 +200,7 @@ public class SQLiteConnection{
         return values
     }
     
-    private func getAllValue(connector:SSConnector) -> [AnyObject] {
+    fileprivate func getAllValue(_ connector:SSConnector) -> [AnyObject] {
         return removePrimaryKey(connector).map{
             if let theValue = $0.value {
                 return theValue
@@ -209,15 +209,15 @@ public class SQLiteConnection{
         }
     }
     
-    private func removePrimaryKey(connector:SSConnector) -> [SSScan] {
+    fileprivate func removePrimaryKey(_ connector:SSConnector) -> [SSScan] {
         var scans = connector.scans
-        for scan in scans.enumerate() {
-            if scan.element.isPrimaryKey { scans.removeAtIndex(scan.index) }
+        for scan in scans.enumerated() {
+            if scan.element.isPrimaryKey { scans.remove(at: scan.offset) }
         }
         return scans
     }
     
-    private func makePlaceholderStatement(count:Int) -> String {
+    fileprivate func makePlaceholderStatement(_ count:Int) -> String {
         var rtn = String.empty
         for i in 0..<count {
             rtn += "?"
@@ -230,27 +230,27 @@ public class SQLiteConnection{
     
     func scan<T:SSMappable>() -> (SSConnector,T){
         let model = T()
-        let connector = SSConnector(type: .Scan)
+        let connector = SSConnector(type: .scan)
         model.dbMap(connector)
         return (connector,model)
     }
     func mapping<T:SSMappable>() -> T{
         let model = T()
-        let connector = SSConnector(type: .Scan)
+        let connector = SSConnector(type: .scan)
         model.dbMap(connector)
         var values:[String:AnyObject] = [:]
-        for item in connector.scans.enumerate() {
+        for item in connector.scans.enumerated() {
             switch item.element.type! {
-            case .CL_Integer:
-                values[item.element.name] = 0
-            case .CL_Text:
-                values[item.element.name] = "sample\(item.index)"
+            case .cl_Integer:
+                values[item.element.name] = 0 as AnyObject
+            case .cl_Text:
+                values[item.element.name] = "sample\(item.offset)" as AnyObject
             default:
                 break
             }
         }
         connector.values = values
-        connector.type = .Map
+        connector.type = .map
         model.dbMap(connector)
         return model
     }
@@ -259,25 +259,25 @@ public class SQLiteConnection{
 /// Use for let work to column. e.g) scan column info, mapping value to column variables
 public protocol SSWorker{
     var value: AnyObject? { get set }
-    func work<T>(inout lhs:T?)
+    func work<T>(_ lhs:inout T?)
 }
 
-public class SSConnector {
+open class SSConnector {
     var values:[String:AnyObject?]=[:]
     var scans:[SSScan] = []
     var type:SSType
     public init(type:SSType){
         self.type = type
     }
-    public subscript (name:String,attrs:CLAttr...) -> SSWorker{
+    open subscript (name:String,attrs:CLAttr...) -> SSWorker{
         switch self.type {
-        case .Map:  // return map worker
+        case .map:  // return map worker
             let map = SSMap()
             if let theValue = values[name]{
                 map.value = theValue
             }
             return map
-        case .Scan: // return scan worker
+        case .scan: // return scan worker
             let scan = SSScan(name,attrs: attrs)
             scans.append(scan)
             return scan
@@ -286,54 +286,54 @@ public class SSConnector {
 }
 
 public enum SSType {
-    case Scan
-    case Map
+    case scan
+    case map
 }
 
 public enum CLType{
-    case CL_Integer
-    case CL_Text
-    case CL_Real
+    case cl_Integer
+    case cl_Text
+    case cl_Real
 //    case CL_BLOB
 }
 
 public enum CLAttr{
-    case PrimaryKey
-    case AutoIncrement
-    case NotNull
-    case Unique
-    case Default(AnyObject)
-    case Check(String)
+    case primaryKey
+    case autoIncrement
+    case notNull
+    case unique
+    case `default`(AnyObject)
+    case check(String)
 }
 
 public func == (lhs:CLAttr,rhs:CLAttr) -> Bool{
     switch (lhs,rhs) {
-    case (.PrimaryKey,.PrimaryKey):
+    case (.primaryKey,.primaryKey):
         return true
-    case (.AutoIncrement,.AutoIncrement):
+    case (.autoIncrement,.autoIncrement):
         return true
-    case (.NotNull,.NotNull):
+    case (.notNull,.notNull):
         return true
-    case (.Unique,.Unique):
+    case (.unique,.unique):
         return true
-    case (.Default,.Default):
+    case (.default,.default):
         return true
-    case (.Check,.Check):
+    case (.check,.check):
         return true
     default:
         return false
     }
 }
 
-infix operator <- {
-    precedence 20
-    associativity none
+precedencegroup WorkPrecedence {
+    associativity: none
 }
+infix operator <- : WorkPrecedence
 
-public func <- <T>(inout lhs:T?,rhs:SSWorker){
+public func <- <T>(lhs:inout T?,rhs:SSWorker){
     rhs.work(&lhs)
 }
-
+import Swift
 
 
 

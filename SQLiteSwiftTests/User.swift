@@ -21,7 +21,7 @@ class User: SSMappable {
         
     }
     
-    func dbMap(connector:SSConnector){
+    func dbMap(_ connector:SSConnector){
         id       <- connector["id", .PrimaryKey, .AutoIncrement, .NotNull]
         name     <- connector["name", .Unique]
         age      <- connector["age", .Check("age>0")]

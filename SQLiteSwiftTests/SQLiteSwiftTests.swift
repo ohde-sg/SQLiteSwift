@@ -11,14 +11,14 @@ import XCTest
 
 class SQLiteSwiftTests: XCTestCase {
     let dbFile:String = "sqliteswift.db"
-    let dir = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
-    private var dbFilePath: String {
+    let dir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+    fileprivate var dbFilePath: String {
         get{
             return self.dir + "/" + self.dbFile
         }
     }
     var _conn :SQLite?
-    private var conn: SQLite{
+    fileprivate var conn: SQLite{
         if _conn == nil {
             _conn = SQLite(self.dbFilePath)
             return _conn!
@@ -202,7 +202,7 @@ class SQLiteSwiftTests: XCTestCase {
         
         let users:[User] = [user,user2]
         
-        users.enumerate().forEach{
+        users.enumerated().forEach{
             let result:SSResult<User> = SQLiteConnection(filePath: dbFilePath).insert($0.element)
             XCTAssertTrue(result.result)
         }
@@ -264,7 +264,7 @@ class SQLiteSwiftTests: XCTestCase {
         
         let connection = SQLiteConnection(filePath: dbFilePath)
         connection.beginTransaction()
-        users.enumerate().forEach{
+        users.enumerated().forEach{
             let result:SSResult<User> = connection.insert($0.element)
             XCTAssertTrue(result.result)
         }
@@ -318,7 +318,7 @@ class SQLiteSwiftTests: XCTestCase {
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
         }
     }
