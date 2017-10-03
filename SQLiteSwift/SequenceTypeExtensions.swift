@@ -8,8 +8,8 @@
 
 import Foundation
 
-extension SequenceType {
-    func count(judge:(Self.Generator.Element) -> Bool) -> Int {
+extension Sequence {
+    func count(_ judge:(Self.Iterator.Element) -> Bool) -> Int {
         var count = 0
         for item in self {
             if judge(item) { count += 1 }
@@ -17,15 +17,15 @@ extension SequenceType {
         return count
     }
     
-    func select(judge:(Self.Generator.Element) -> Bool) -> [Self.Generator.Element] {
-        var rtn:[Self.Generator.Element] = []
+    func select(_ judge:(Self.Iterator.Element) -> Bool) -> [Self.Iterator.Element] {
+        var rtn:[Self.Iterator.Element] = []
         for item in self{
             if judge(item) { rtn.append(item) }
         }
         return rtn
     }
     
-    func first(judge:(Self.Generator.Element) -> Bool) -> Self.Generator.Element? {
+    func first(_ judge:(Self.Iterator.Element) -> Bool) -> Self.Iterator.Element? {
         for item in self {
             if judge(item) { return item }
         }
